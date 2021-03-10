@@ -9,7 +9,7 @@ def createDB():
     cursor = conn.cursor()
     sql = "SELECT name from sqlite_master WHERE type='table' and name=?"
 
-    # test for vehicles record
+    # test for vehicles vehicle
     cursor.execute(sql,["VEHICLES"])
     result = cursor.fetchone()
 
@@ -85,8 +85,12 @@ def getFuelTypes():
     cursor.execute("SELECT ID,NAME from FUEL_TYPES")
     return cursor.fetchall()
 
-def addVehicle(record):
-    if 'ID' in record:
+def getRecordTypes():
+    cursor.execute("SELECT ID,NAME from RECORD_TYPES")
+    return cursor.fetchall()
+
+def addVehicle(vehicle):
+    if 'ID' in vehicle:
         sql = '''UPDATE VEHICLES set 
     REG_NO=:REG_NO,
     MAKE=:MAKE, 
@@ -111,6 +115,57 @@ def addVehicle(record):
     ) VALUES 
     (
     :REG_NO, :MAKE, :MODEL, :YEAR, :PURCHASE_PRICE, :PURCHASE_DATE, :FUEL_TYPE_ID,:FUEL_CAPACITY, :OIL_TYPE, :OIL_CAPACITY, :TYRE_SIZE_FRONT, :TYRE_SIZE_REAR, :TYRE_PRESSURE_FRONT, :TYRE_PRESSURE_REAR
+    )'''
+
+    cursor.execute(sql, vehicle)
+    conn.commit()
+
+
+def loadRecord(vehicleId=None):
+    sql= """
+    select * from RECORDS
+    """
+
+    if vehicleId:
+        sql = sql + ' where VEHICLE_ID=:VEHICLE_ID'
+
+    cursor.execute(sql, {'VEHICLE_ID':vehicleId})
+
+    return cursor.fetchall()
+
+def addRecord(record):
+    if 'ID' in record:
+        sql = '''UPDATE RECORDS set 
+                VEHICLE_ID=:VEHICLE_ID,
+                RECORD_TYPE_ID=:RECORD_TYPE_ID,
+                DATE=:DATE,
+                ODOMETER=:ODOMETER,
+                TRIP=:TRIP,
+                COST=:COST,
+                ITEM_COUNT=:ITEM_COUNT,
+                NOTES=:NOTES
+    WHERE ID=:ID
+    '''
+
+    else:
+        sql = '''INSERT INTO VEHICLES (
+                VEHICLE_ID,
+                RECORD_TYPE_ID,
+                DATE,
+                ODOMETER,
+                TRIP,
+                COST,
+                ITEM_COUNT,
+                NOTES=:NOTES
+    ) VALUES (
+                :VEHICLE_ID,
+                :RECORD_TYPE_ID,
+                :DATE,
+                :ODOMETER,
+                :TRIP,
+                :COST,
+                :ITEM_COUNT,
+                :NOTES
     )'''
 
     cursor.execute(sql, record)

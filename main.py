@@ -21,6 +21,12 @@ def getFuelTypes(answers):
 
     return choices 
 
+def getRecordTypes(answers):
+    types = db.getRecordTypes()
+    choices = [{'name':i[1],'value':i[0]} for i in types]
+
+    return choices 
+
 def createEditVehicle(vehicle=None):
     questions = [
         {
@@ -144,6 +150,44 @@ def createEditVehicle(vehicle=None):
 
     db.addVehicle(answers)
 
+def createEditRecord(record=None):
+    allVehicles = db.loadVehicles()
+    questions = [
+        {
+            'type':'list',
+            'name':'VEHICLE_ID',
+            'message':'Reg. No.:',
+            'default': record['VEHICLE_ID'] if record else '',
+            'choices':[{'name':i[1],'value':i[0]} for i in allVehicles]
+        },
+        {
+            'type':'list',
+            'name':'RECORD_TYPE_ID',
+            'message':'Type',
+            'default': record['RECORD_TYPE_ID'] if record else '',
+            'choices':getRecordTypes
+        },
+        {
+            'type':'input',
+            'name':'DATE',
+            'message':'Date',
+            'default': record['DATE'] if record else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+    ]
+
+    answers = prompt(questions)
+    print(answers)
+
+
+    # process, then saveo
+    if(record):
+        answers['ID'] = record['ID']
+
+
+
+    #db.addRecord(answers)
+
 def selectVehicle():
     allVehicles = db.loadVehicles()
     print(allVehicles)
@@ -163,6 +207,51 @@ def selectVehicle():
    
     return next(x for x in allVehicles if x[0] == answers['opts'])
 
+def recordsMenu():
+    """
+    CRUD ops for records
+    """
+    questions = [
+        {
+            'type':'list',
+            'name':'opts',
+            'message':'Records menu',
+            'choices':[
+                {
+                    'name':'Add',
+                    'value':'add'
+                },
+                {
+                    'name':'Edit',
+                    'value':'edit'
+                },
+                {
+                    'name':'Remove',
+                    'value':'remove'
+                },
+                Separator(),
+                {
+                    'name':'Back',
+                    'value':'back'
+                },
+            ]
+        }
+    ]
+
+    answers = prompt(questions)
+
+    if answers['opts'] == 'add':
+        print('add record')
+        createEditRecord()
+    elif answers['opts'] == 'edit':
+        print('edit vehicle')
+        #vehicle = selectVehicle()
+        #createEditVehicle(vehicle)
+    elif answers['opts'] == 'remove':
+        print('remove vehicle')
+    else:
+        print('return to main')
+    
 def vehiclesMenu():
     """
     CRUD ops for vehicles
@@ -247,10 +336,10 @@ def mainMenu():
     if answers['opts'] == 'exit':
         running = False
     elif answers["opts"] == 'vehicles':
-        print('load vehicle')
+        print('mod vehicles')
         vehiclesMenu()
     elif answers["opts"] == 'records':
-        print('add vehicle')
+        print('mod records')
         recordsMenu()
 
 def main():
