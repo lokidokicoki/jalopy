@@ -86,7 +86,7 @@ def getFuelTypes():
     return cursor.fetchall()
 
 def addVehicle(record):
-    if(record['ID'] is not None):
+    if 'ID' in record:
         sql = '''UPDATE VEHICLES set 
     REG_NO=:REG_NO,
     MAKE=:MAKE, 
