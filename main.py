@@ -1,102 +1,257 @@
 import sqlite3
 import datetime
-import tkinter as tk
+from collections import defaultdict
+from PyInquirer import prompt, Separator
+import db
 
-conn = sqlite3.connect("jalopy.db")
-cursor = None
+selectedVehicle = None
+running = True
 
-def createDB():
-    cursor = conn.cursor()
-    sql = "SELECT name from sqlite_master WHERE type='table' and name=?"
+def getFuelTypes(answers):
+    types = db.getFuelTypes()
+    choices = [{'name':i[1],'value':i[0]} for i in types]
 
-    # test for vehicles record
-    cursor.execute(sql,["VEHICLES"])
-    result = cursor.fetchone()
+    return choices 
 
-    if result is None:
-        print("create jalopy.db tables")
-        cursor.executescript("""
-            CREATE TABLE VEHICLES(
-                ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                REG_NO CHAR(10) NOT NULL,
-                MAKE TEXT NOT NULL,
-                MODEL TEXT NOT NULL,
-                YEAR INTEGER NOT NULL,
-                PURCHASE_DATE TEXT,
-                PURCHASE_PRICE REAL,
-                FUEL_TYPE_ID INTEGER NOT NULL,
-                FUEL_CAPACITY REAL,
-                OIL_TYPE TEXT,
-                OIL_CAPACITY REAL,
-                TYRE_SIZE_FRONT TEXT,
-                TYRE_SIZE_REAR TEXT,
-                TYRE_PRESSURE_FRONT REAL,
-                TYRE_PRESSURE_REAR REAL
-            );
+def createEditVehicle(vehicle=None):
+    questions = [
+        {
+            'type':'input',
+            'name':'REG_NO',
+            'message':'Reg. No.:',
+            'default': vehicle['REG_NO'] if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'MAKE',
+            'message':'Make',
+            'default': vehicle['MAKE'] if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'MODEL',
+            'message':'Model',
+            'default': vehicle['MODEL'] if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'YEAR',
+            'message':'Year',
+            'default': str(vehicle['YEAR']) if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'PURCHASE_DATE',
+            'message':'Purchase Date',
+            'default': vehicle['PURCHASE_DATE'] if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'PURCHASE_PRICE',
+            'message':'Purchase Price',
+            'default': str(vehicle['PURCHASE_PRICE']) if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'list',
+            'name':'FUEL_TYPE_ID',
+            'message':'Fuel type',
+            'choices':getFuelTypes,
+            'default': vehicle['FUEL_TYPE_ID'] if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'FUEL_CAPACITY',
+            'message':'Fuel Capacity (ltr)',
+            'default': str(vehicle['FUEL_CAPACITY']) if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'OIL_TYPE',
+            'message':'Oil Type',
+            'default': vehicle['OIL_TYPE'] if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'OIL_CAPACITY',
+            'message':'Oil Capacity (ltr)',
+            'default': str(vehicle['OIL_CAPACITY']) if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'TYRE_SIZE_FRONT',
+            'message':'Tyre size front',
+            'default': vehicle['TYRE_SIZE_FRONT'] if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'TYRE_PRESSURE_FRONT',
+            'message':'Tyre pressure front',
+            'default': str(vehicle['TYRE_PRESSURE_FRONT']) if vehicle else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'TYRE_SIZE_REAR',
+            'message':'Tyre size rear',
+            'default': lambda answers: vehicle['TYRE_SIZE_REAR'] if vehicle else answers['TYRE_SIZE_FRONT'],
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'TYRE_PRESSURE_REAR',
+            'message':'Tyre pressure rear',
+            'default': lambda answers: str(vehicle['TYRE_PRESSURE_REAR']) if vehicle else answers['TYRE_PRESSURE_FRONT'],
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+    ]
 
-            CREATE TABLE FUEL_TYPES(
-                ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                NAME TEXT NOT NULL
-            );
+    answers = prompt(questions)
 
-            INSERT INTO FUEL_TYPES(NAME) VALUES('Unleaded');
-            INSERT INTO FUEL_TYPES(NAME) VALUES('Super Unleaded');
-            INSERT INTO FUEL_TYPES(NAME) VALUES('Diesel');
-            INSERT INTO FUEL_TYPES(NAME) VALUES('Super Diesel');
 
-            CREATE TABLE RECORDS(
-                ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                VEHICLE_ID INTEGER NOT NULL,
-                RECORD_TYPE_ID CHAR(1) NOT NULL,
-                DATE TEXT NOT NULL,
-                ODOMETER INTEGER NOT NULL,
-                TRIP REAL,
-                COST REAL NOT NULL,
-                ITEM_COUNT REAL,
-                NOTES TEXT
-            );
+    # process, then save
+    answers['REG_NO'] = answers['REG_NO'].upper()
+    answers['MAKE'] = answers['MAKE'].lower().capitalize()
+    answers['MODEL'] = answers['MODEL'].lower().capitalize()
+    answers['YEAR'] = int(answers['YEAR'])
+    answers['PURCHASE_PRICE'] = float(answers['PURCHASE_PRICE'])
+    answers['FUEL_CAPACITY'] = float(answers['FUEL_CAPACITY'])
+    answers['OIL_CAPACITY'] = float(answers['OIL_CAPACITY'])
+    answers['FUEL_TYPE_ID`'] = int(answers['FUEL_TYPE_ID'])
+    answers['TYRE_PRESSURE_FRONT`'] = float(answers['TYRE_PRESSURE_FRONT'])
+    answers['TYRE_PRESSURE_REAR`'] = float(answers['TYRE_PRESSURE_REAR'])
 
-            CREATE TABLE RECORD_TYPES(
-                ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                NAME TEXT NOT NULL
-            );
-            INSERT INTO RECORD_TYPES(NAME) VALUES('Fuel');
-            INSERT INTO RECORD_TYPES(NAME) VALUES('Service');
-            INSERT INTO RECORD_TYPES(NAME) VALUES('Maintenance');
-            INSERT INTO RECORD_TYPES(NAME) VALUES('Tax');
-            INSERT INTO RECORD_TYPES(NAME) VALUES('Insurance');
-            INSERT INTO RECORD_TYPES(NAME) VALUES('M.O.T.');
-            """)
-        conn.commit();
+    if(vehicle):
+        answers['ID'] = vehicle['ID']
+
+    db.addVehicle(answers)
+
+def selectVehicle():
+    allVehicles = db.loadVehicles()
+    print(allVehicles)
+
+    questions = [
+        {
+            'type':'list',
+            'name':'opts',
+            'message':'Select vehicle to edit',
+            'choices':[{'name':i[1],'value':i[0]} for i in allVehicles]
+        }
+    ]
+
+    answers = prompt(questions)
+
+    print(answers)
+   
+    return next(x for x in allVehicles if x[0] == answers['opts'])
+
+def vehiclesMenu():
+    """
+    CRUD ops for vehicles
+    """
+    questions = [
+        {
+            'type':'list',
+            'name':'opts',
+            'message':'Vehicle menu',
+            'choices':[
+                {
+                    'name':'Add',
+                    'value':'add'
+                },
+                {
+                    'name':'Edit',
+                    'value':'edit'
+                },
+                {
+                    'name':'Remove',
+                    'value':'remove'
+                },
+                Separator(),
+                {
+                    'name':'Back',
+                    'value':'back'
+                },
+            ]
+        }
+    ]
+
+    answers = prompt(questions)
+
+    if answers['opts'] == 'add':
+        print('add vehicle')
+        createEditVehicle()
+    elif answers['opts'] == 'edit':
+        print('edit vehicle')
+        vehicle = selectVehicle()
+        createEditVehicle(vehicle)
+    elif answers['opts'] == 'remove':
+        print('remove vehicle')
     else:
-        print("DB already exists")
+        print('return to main')
+    
+
+def mainMenu():
+    """
+    Main menu
+    """
+    global running
+
+    questions = [
+        {
+            'type':'list',
+            'name':'opts',
+            'message':'Things to do',
+            'choices':[
+                {
+                    'name':'Vehicles',
+                    'key':'v',
+                    'value':'vehicles'
+                },
+                {
+                    'name':'Records',
+                    'key':'r',
+                    'value':'records'
+                },
+                Separator(),
+                {
+                    'name': 'Exit',
+                    'key':'x',
+                    'value':'exit'
+                }
+            ]
+        }
+    ]   
+
+    answers = prompt(questions)
 
 
-createDB()
-conn.close();
+    if answers['opts'] == 'exit':
+        running = False
+    elif answers["opts"] == 'vehicles':
+        print('load vehicle')
+        vehiclesMenu()
+    elif answers["opts"] == 'records':
+        print('add vehicle')
+        recordsMenu()
 
+def main():
+    db.createDB()
 
-class Application(tk.Frame):
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.master = master
-        self.pack()
-        self.create_widgets()
+    while running:
+        mainMenu()
 
-    def create_widgets(self):
-        self.hi_there = tk.Button(self)
-        self.hi_there["text"] = "Hello"
-        self.hi_there["command"] = self.say_hi
-        self.hi_there.pack(side="top")
+    db.conn.close()
+    print('Night night')
 
-        self.quit = tk.Button(self,text="Qit", fg="red",
-                command=self.master.destroy)
-        
-        self.quit.pack(side="bottom")
-
-    def say_hi(self):
-        print("hi yall")
-
-root = tk.Tk()
-app = Application(master = root)
-app.mainloop()
+main()
