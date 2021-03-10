@@ -2,10 +2,18 @@ import sqlite3
 import datetime
 from collections import defaultdict
 from PyInquirer import prompt, Separator
+import configparser
+from shutil import copyfile
+from os.path import exists
 import db
 
 selectedVehicle = None
 running = True
+config = configparser.ConfigParser()
+config.read('config.ini')
+print(config['db']['path'])
+
+
 
 def getFuelTypes(answers):
     types = db.getFuelTypes()
@@ -246,12 +254,18 @@ def mainMenu():
         recordsMenu()
 
 def main():
+    if exists(config['db']['path']):
+        print('Shared DB exists')
+        copyfile(config['db']['path'], 'jalopy.db')
+    else:
+        print('Shared DB not found, we will fix it!')
     db.createDB()
 
     while running:
         mainMenu()
 
     db.conn.close()
+    copyfile('jalopy.db', config['db']['path'])
     print('Night night')
 
 main()
