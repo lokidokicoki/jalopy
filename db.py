@@ -148,7 +148,7 @@ def addRecord(record):
     '''
 
     else:
-        sql = '''INSERT INTO VEHICLES (
+        sql = '''INSERT INTO RECORDS (
                 VEHICLE_ID,
                 RECORD_TYPE_ID,
                 DATE,
@@ -156,7 +156,7 @@ def addRecord(record):
                 TRIP,
                 COST,
                 ITEM_COUNT,
-                NOTES=:NOTES
+                NOTES
     ) VALUES (
                 :VEHICLE_ID,
                 :RECORD_TYPE_ID,
