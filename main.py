@@ -13,7 +13,8 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 print(config['db']['path'])
 
-
+litresPerGallon = 4.54609
+kmPerMile = 1.60934
 
 def getFuelTypes(answers):
     types = db.getFuelTypes()
@@ -26,6 +27,15 @@ def getRecordTypes(answers):
     choices = [{'name':i[1],'value':i[0]} for i in types]
 
     return choices 
+
+def calculateEconomy(record):
+    """
+    mpg
+    l/100km
+    km/l
+    """
+    mpg = record['TRIP']/(record['ITEM_COUNT']/litresPerGallon)
+    print('{:0.2f} mpg'.format(mpg))
 
 def createEditVehicle(vehicle=None):
     questions = [
@@ -174,19 +184,62 @@ def createEditRecord(record=None):
             'default': record['DATE'] if record else '',
             'validate': lambda val: len(val) != 0 or 'Please supply a value'
         },
+        {
+            'type':'input',
+            'name':'ODOMETER',
+            'message':'Odometer',
+            'default': record['ODOMETER'] if record else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'TRIP',
+            'message':'Trip (optional)',
+            'default': record['DATE'] if record else '',
+        },
+        {
+            'type':'input',
+            'name':'COST',
+            'message':'Cost',
+            'default': record['COST'] if record else '',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'ITEM_COUNT',
+            'message':'Item Count',
+            'default': record['ITEM_COUNT'] if record else '1',
+            'validate': lambda val: len(val) != 0 or 'Please supply a value'
+        },
+        {
+            'type':'input',
+            'name':'NOTES',
+            'message':'Notes (optional)',
+            'default': record['NOTES'] if record else '',
+        },
     ]
 
     answers = prompt(questions)
-    print(answers)
 
 
     # process, then saveo
     if(record):
         answers['ID'] = record['ID']
 
+    answers['VEHICLE_ID'] = int(answers['VEHICLE_ID'])
+    answers['RECORD_TYPE_ID'] = int(answers['RECORD_TYPE_ID'])
+    answers['ODOMETER'] = int(answers['ODOMETER'])
+    answers['TRIP'] = float(answers['TRIP'])
+    answers['COST'] = float(answers['COST'])
+    answers['ITEM_COUNT'] = float(answers['ITEM_COUNT'])
 
 
-    #db.addRecord(answers)
+    print(answers)
+    
+    if answers['RECORD_TYPE_ID'] == 1:
+        calculateEconomy(answers)
+
+    db.addRecord(answers)
 
 def selectVehicle():
     allVehicles = db.loadVehicles()
