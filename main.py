@@ -188,27 +188,27 @@ def createEditRecord(record=None):
             'type':'input',
             'name':'ODOMETER',
             'message':'Odometer',
-            'default': record['ODOMETER'] if record else '',
+            'default': str(record['ODOMETER']) if record else '',
             'validate': lambda val: len(val) != 0 or 'Please supply a value'
         },
         {
             'type':'input',
             'name':'TRIP',
             'message':'Trip (optional)',
-            'default': record['DATE'] if record else '',
+            'default': str(record['TRIP']) if record else '',
         },
         {
             'type':'input',
             'name':'COST',
             'message':'Cost',
-            'default': record['COST'] if record else '',
+            'default': str(record['COST']) if record else '',
             'validate': lambda val: len(val) != 0 or 'Please supply a value'
         },
         {
             'type':'input',
             'name':'ITEM_COUNT',
             'message':'Item Count',
-            'default': record['ITEM_COUNT'] if record else '1',
+            'default': str(record['ITEM_COUNT']) if record else '1',
             'validate': lambda val: len(val) != 0 or 'Please supply a value'
         },
         {
@@ -243,7 +243,6 @@ def createEditRecord(record=None):
 
 def selectVehicle():
     allVehicles = db.loadVehicles()
-    print(allVehicles)
 
     questions = [
         {
@@ -256,9 +255,23 @@ def selectVehicle():
 
     answers = prompt(questions)
 
-    print(answers)
-   
     return next(x for x in allVehicles if x[0] == answers['opts'])
+
+def selectRecord(vehicle):
+    allRecords = db.loadRecords(vehicle['ID'])
+
+    questions = [
+        {
+            'type':'list',
+            'name':'opts',
+            'message':'Select record to edit',
+            'choices':[{'name':i['DATE'],'value':i['ID']} for i in allRecords]
+        }
+    ]
+
+    answers = prompt(questions)
+
+    return next(x for x in allRecords if x[0] == answers['opts'])
 
 def recordsMenu():
     """
@@ -298,8 +311,10 @@ def recordsMenu():
         createEditRecord()
     elif answers['opts'] == 'edit':
         print('edit vehicle')
-        #vehicle = selectVehicle()
-        #createEditVehicle(vehicle)
+        vehicle = selectVehicle()
+        record = selectRecord(vehicle)
+        print(record)
+        createEditRecord(record)
     elif answers['opts'] == 'remove':
         print('remove vehicle')
     else:
