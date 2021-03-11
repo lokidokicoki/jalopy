@@ -121,7 +121,7 @@ def addVehicle(vehicle):
     conn.commit()
 
 
-def loadRecord(vehicleId=None):
+def loadRecords(vehicleId=None):
     sql= """
     select * from RECORDS
     """
