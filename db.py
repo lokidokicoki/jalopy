@@ -19,7 +19,8 @@ def createDB():
 
     if result is None:
         print("create jalopy.db tables")
-        cursor.executescript("""
+        cursor.executescript(
+            """
             CREATE TABLE VEHICLES(
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 REG_NO CHAR(10) NOT NULL,
@@ -70,14 +71,16 @@ def createDB():
             INSERT INTO RECORD_TYPES(NAME) VALUES('Tax');
             INSERT INTO RECORD_TYPES(NAME) VALUES('Insurance');
             INSERT INTO RECORD_TYPES(NAME) VALUES('M.O.T.');
-            """)
+            """
+        )
         conn.commit()
     else:
         print("DB exists")
 
 
 def getVehicles():
-    cursor.execute("""
+    cursor.execute(
+        """
     SELECT
     ID,
     REG_NO,
@@ -95,7 +98,8 @@ def getVehicles():
     TYRE_PRESSURE_FRONT,
     TYRE_PRESSURE_REAR
     FROM VEHICLES
-            """)
+            """
+    )
 
     return cursor.fetchall()
 
@@ -120,8 +124,8 @@ def addVehicle(vehicle):
     """
     Add/amend vehicle record
     """
-    if 'ID' in vehicle:
-        sql = '''
+    if "ID" in vehicle:
+        sql = """
         UPDATE VEHICLES SET
         REG_NO=:REG_NO,
         MAKE=:MAKE,
@@ -138,10 +142,10 @@ def addVehicle(vehicle):
         TYRE_PRESSURE_FRONT=:TYRE_PRESSURE_FRONT,
         TYRE_PRESSURE_REAR=:TYRE_PRESSURE_REAR
     WHERE ID=:ID
-    '''
+    """
 
     else:
-        sql = '''INSERT INTO VEHICLES (
+        sql = """INSERT INTO VEHICLES (
     REG_NO,
     MAKE,
     MODEL,
@@ -171,7 +175,7 @@ def addVehicle(vehicle):
     :TYRE_SIZE_REAR,
     :TYRE_PRESSURE_FRONT,
     :TYRE_PRESSURE_REAR
-    )'''
+    )"""
 
     cursor.execute(sql, vehicle)
     conn.commit()
@@ -183,9 +187,9 @@ def getRecords(vehicleId=None):
     """
 
     if vehicleId:
-        sql = sql + ' where VEHICLE_ID=:VEHICLE_ID'
+        sql = sql + " where VEHICLE_ID=:VEHICLE_ID"
 
-    cursor.execute(sql, {'VEHICLE_ID': vehicleId})
+    cursor.execute(sql, {"VEHICLE_ID": vehicleId})
 
     return cursor.fetchall()
 
@@ -194,8 +198,8 @@ def addRecord(record):
     """
     Add/amend record
     """
-    if 'ID' in record:
-        sql = '''
+    if "ID" in record:
+        sql = """
             UPDATE RECORDS SET
             VEHICLE_ID=:VEHICLE_ID,
             RECORD_TYPE_ID=:RECORD_TYPE_ID,
@@ -206,9 +210,9 @@ def addRecord(record):
             ITEM_COUNT=:ITEM_COUNT,
             NOTES=:NOTES
         WHERE ID=:ID
-        '''
+        """
     else:
-        sql = '''INSERT INTO RECORDS (
+        sql = """INSERT INTO RECORDS (
                 VEHICLE_ID,
                 RECORD_TYPE_ID,
                 DATE,
@@ -226,7 +230,7 @@ def addRecord(record):
                 :COST,
                 :ITEM_COUNT,
                 :NOTES
-    )'''
+    )"""
 
     cursor.execute(sql, record)
     conn.commit()
