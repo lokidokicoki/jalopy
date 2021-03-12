@@ -2,10 +2,8 @@ from PyInquirer import prompt, Separator
 import configparser
 from shutil import copyfile
 from os.path import exists
-import pprint
 import db
 
-pp = pprint.PrettyPrinter(indent=2)
 selectedVehicle = None
 running = True
 config = configparser.ConfigParser()
@@ -187,7 +185,7 @@ def createEditRecord(record=None):
     """
     Create/edit 'record'
     """
-    allVehicles = db.loadVehicles()
+    allVehicles = db.getVehicles()
     questions = [
         {
             'type': 'list',
@@ -269,7 +267,7 @@ def selectVehicle():
     """
     Prompt user to select a vehicle
     """
-    allVehicles = db.loadVehicles()
+    allVehicles = db.getVehicles()
 
     questions = [
         {
@@ -289,14 +287,16 @@ def selectRecord(vehicle):
     """
     Select a record for a specific vehicle
     """
-    allRecords = db.loadRecords(vehicle['ID'])
+    allRecords = db.getRecords(vehicle['ID'])
 
     questions = [
         {
             'type': 'list',
             'name': 'opts',
             'message': 'Select record',
-            'choices': [{'name': i['DATE'], 'value': i['ID']} for i in allRecords]
+            'choices': [
+                {'name': i['DATE'], 'value': i['ID']} for i in allRecords
+            ]
         }
     ]
 
@@ -311,7 +311,7 @@ def stats(vehicle):
     """
 
     # get all records for this vehicle
-    records = db.loadRecords(vehicle['ID'])
+    records = db.getRecords(vehicle['ID'])
     types = db.getRecordTypes()
     totalCost = 0
     avgMpg = 0
@@ -320,9 +320,9 @@ def stats(vehicle):
     counts = [{'id': x['ID'], 'name':x['NAME'], 'count':0} for x in types]
 
     for record in records:
-        count = next(x for x in counts if x['id'] == int(record['RECORD_TYPE_ID']))
+        count = next(x for x in counts if x['id'] == record['RECORD_TYPE_ID'])
         count['count'] = count['count'] + 1
-        if record['RECORD_TYPE_ID'] == '1':
+        if record['RECORD_TYPE_ID'] == 1:
             eff = calculateEconomy(record, True)
 
             avgMpg = avgMpg + eff['mpg']
@@ -332,14 +332,14 @@ def stats(vehicle):
         totalCost = totalCost + record['COST']
     fuelCount = next(x for x in counts if x['id'] == 1)
 
+    print('Record counts:')
+    for i in counts:
+        print('{}: {}'.format(i['name'], i['count']))
+    print('----')
     print('Avg. MPG: {:0.2f}'.format(avgMpg/fuelCount['count']))
     print('Avg. km/l: {:0.2f}'.format(avgKpl/fuelCount['count']))
     print('Avg. l/100Km: {:0.2f}'.format(avgL100/fuelCount['count']))
     print('Total cost: {:0.2f}'.format(totalCost))
-
-    print('Record counts:')
-    for i in counts:
-        print('{}: {}'.format(i['name'], i['count']))
 
 
 def recordsMenu():
