@@ -51,7 +51,7 @@ def createDB():
             CREATE TABLE RECORDS(
                 ID INTEGER PRIMARY KEY AUTOINCREMENT,
                 VEHICLE_ID INTEGER NOT NULL,
-                RECORD_TYPE_ID CHAR(1) NOT NULL,
+                RECORD_TYPE_ID INTEGER NOT NULL,
                 DATE TEXT NOT NULL,
                 ODOMETER INTEGER NOT NULL,
                 TRIP REAL,
@@ -76,7 +76,7 @@ def createDB():
         print("DB exists")
 
 
-def loadVehicles():
+def getVehicles():
     cursor.execute("""
     SELECT
     ID,
@@ -177,7 +177,7 @@ def addVehicle(vehicle):
     conn.commit()
 
 
-def loadRecords(vehicleId=None):
+def getRecords(vehicleId=None):
     sql = """
     select * from RECORDS
     """
