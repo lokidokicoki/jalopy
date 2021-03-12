@@ -5,22 +5,14 @@ import utils
 
 running = True
 
-
-def getFuelTypes(answers):
-    """
-    Get fuel types
-    """
-    types = db.getFuelTypes()
-    choices = [{"name": i[1], "value": i[0]} for i in types]
-
-    return choices
+sepString = "\n===\n"
 
 
-def getRecordTypes(answers):
+def getTypeChoices(requiredType):
     """
-    Get record types
+    Get 'type' records, either ruel or record based on 'requiredType'
     """
-    types = db.getRecordTypes()
+    types = db.getFuelTypes() if requiredType == "fuel" else db.getRecordTypes()
     choices = [{"name": i[1], "value": i[0]} for i in types]
 
     return choices
@@ -48,18 +40,17 @@ def recordsMenu():
     answers = prompt(questions)
 
     if answers["opts"] == "add":
-        print("add record")
-        createEditRecord()
+        print("\nAdd record")
+        recordForm()
     elif answers["opts"] == "edit":
-        print("edit vehicle")
+        print("\nEdit record")
         vehicle = selectVehicle()
         record = selectRecord(vehicle)
-        print(record)
-        createEditRecord(record)
+        recordForm(record)
     elif answers["opts"] == "remove":
-        print("remove vehicle")
+        print("TBD: remove vehicle")
     else:
-        print("return to main")
+        print("Return to main")
 
 
 def vehiclesMenu():
@@ -85,14 +76,14 @@ def vehiclesMenu():
     answers = prompt(questions)
 
     if answers["opts"] == "add":
-        print("add vehicle")
-        createEditVehicle()
+        print("\nAdd vehicle")
+        vehicleForm()
     elif answers["opts"] == "edit":
-        print("edit vehicle")
+        print("\nEdit vehicle")
         vehicle = selectVehicle()
-        createEditVehicle(vehicle)
+        vehicleForm(vehicle)
     elif answers["opts"] == "stats":
-        print("stats vehicle")
+        print("\nStats for vehicle")
         vehicle = selectVehicle()
         results = utils.stats(vehicle)
         print("Record counts:")
@@ -104,41 +95,9 @@ def vehiclesMenu():
         print("Avg. l/100Km: {:0.2f}".format(results["avgL100"]))
         print("Total cost: {:0.2f}".format(results["totalCost"]))
     elif answers["opts"] == "remove":
-        print("remove vehicle")
+        print("TBD: remove vehicle")
     else:
         print("return to main")
-
-
-def mainMenu():
-    """
-    Main menu
-    """
-    global running
-
-    questions = [
-        {
-            "type": "list",
-            "name": "opts",
-            "message": "Things to do",
-            "choices": [
-                {"name": "Vehicles", "key": "v", "value": "vehicles"},
-                {"name": "Records", "key": "r", "value": "records"},
-                Separator(),
-                {"name": "Exit", "key": "x", "value": "exit"},
-            ],
-        }
-    ]
-
-    answers = prompt(questions)
-
-    if answers["opts"] == "exit":
-        running = False
-    elif answers["opts"] == "vehicles":
-        print("mod vehicles")
-        vehiclesMenu()
-    elif answers["opts"] == "records":
-        print("mod records")
-        recordsMenu()
 
 
 def selectVehicle():
@@ -181,7 +140,7 @@ def selectRecord(vehicle):
     return next(x for x in allRecords if x[0] == answers["opts"])
 
 
-def createEditRecord(record=None):
+def recordForm(record=None):
     """
     Create/edit 'record'
     """
@@ -199,7 +158,7 @@ def createEditRecord(record=None):
             "name": "RECORD_TYPE_ID",
             "message": "Type",
             "default": record["RECORD_TYPE_ID"] if record else "",
-            "choices": getRecordTypes,
+            "choices": getTypeChoices("record"),
         },
         {
             "type": "input",
@@ -266,7 +225,7 @@ def createEditRecord(record=None):
     db.addRecord(answers)
 
 
-def createEditVehicle(vehicle=None):
+def vehicleForm(vehicle=None):
     """
     Create/edit vehicle
     """
@@ -317,7 +276,7 @@ def createEditVehicle(vehicle=None):
             "type": "list",
             "name": "FUEL_TYPE_ID",
             "message": "Fuel type",
-            "choices": getFuelTypes,
+            "choices": getTypeChoices("fuel"),
             "default": vehicle["FUEL_TYPE_ID"] if vehicle else "",
             "validate": lambda val: len(val) != 0 or "Please supply a value",
         },
@@ -396,7 +355,37 @@ def createEditVehicle(vehicle=None):
     return db.addVehicle(answers)
 
 
-def main():
+def mainMenu():
+    """
+    Main menu
+    """
+    global running
 
+    questions = [
+        {
+            "type": "list",
+            "name": "opts",
+            "message": "Things to do",
+            "choices": [
+                {"name": "Vehicles", "key": "v", "value": "vehicles"},
+                {"name": "Records", "key": "r", "value": "records"},
+                Separator(),
+                {"name": "Exit", "key": "x", "value": "exit"},
+            ],
+        }
+    ]
+
+    answers = prompt(questions)
+
+    if answers["opts"] == "exit":
+        running = False
+    elif answers["opts"] == "vehicles":
+        vehiclesMenu()
+    elif answers["opts"] == "records":
+        recordsMenu()
+
+
+def main():
+    """Mainloop for cli"""
     while running:
         mainMenu()
