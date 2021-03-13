@@ -47,9 +47,10 @@ def stats(vehicle):
         totalCost = totalCost + record["COST"]
     fuelCount = next(x for x in counts if x["id"] == 1)
 
-    avgMpg = avgMpg / fuelCount["count"]
-    avgKpl = avgKpl / fuelCount["count"]
-    avgL100 = avgL100 / fuelCount["count"]
+    if fuelCount["count"] > 0:
+        avgMpg = avgMpg / fuelCount["count"]
+        avgKpl = avgKpl / fuelCount["count"]
+        avgL100 = avgL100 / fuelCount["count"]
 
     return {
         "counts": counts,
