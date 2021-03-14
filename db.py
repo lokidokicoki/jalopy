@@ -1,8 +1,13 @@
 import sqlite3
 
-conn = sqlite3.connect("jalopy.db")
-conn.row_factory = sqlite3.Row
+conn = None
 cursor = None
+
+
+def init():
+    global conn
+    conn = sqlite3.connect("jalopy.db")
+    conn.row_factory = sqlite3.Row
 
 
 def createDB():
