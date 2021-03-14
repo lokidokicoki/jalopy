@@ -273,6 +273,13 @@ def vehicleForm(vehicle=None):
             "validate": lambda val: len(val) != 0 or "Please supply a value",
         },
         {
+            "type": "input",
+            "name": "PURCHASE_ODOMETER",
+            "message": "Purchase Odometer",
+            "default": str(vehicle["PURCHASE_ODOMETER"]) if vehicle else "",
+            "validate": lambda val: len(val) != 0 or "Please supply a value",
+        },
+        {
             "type": "list",
             "name": "FUEL_TYPE_ID",
             "message": "Fuel type",
@@ -343,6 +350,7 @@ def vehicleForm(vehicle=None):
     answers["MODEL"] = answers["MODEL"].lower().capitalize()
     answers["YEAR"] = int(answers["YEAR"])
     answers["PURCHASE_PRICE"] = float(answers["PURCHASE_PRICE"])
+    answers["PURCHASE_ODOMETER"] = int(answers["PURCHASE_ODOMETER"])
     answers["FUEL_CAPACITY"] = float(answers["FUEL_CAPACITY"])
     answers["OIL_CAPACITY"] = float(answers["OIL_CAPACITY"])
     answers["FUEL_TYPE_ID`"] = int(answers["FUEL_TYPE_ID"])
