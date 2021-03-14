@@ -6,7 +6,7 @@ from gi.repository import Gtk
 
 class MainWindow(Gtk.Window):
     def __init__(self):
-        Gtk.Window.__init__(self, title="Hello")
+        Gtk.Window.__init__(self, title="Jalo.py")
 
         self.button = Gtk.Button(label="clickty")
         self.button.connect("clicked", self.on_button_clicked)
