@@ -16,7 +16,8 @@ class MainWindow(Gtk.Window):
         print("boop")
 
 
-win = MainWindow()
-win.connect("destroy", Gtk.main_quit)
-win.show_all()
-Gtk.main()
+def main():
+    win = MainWindow()
+    win.connect("destroy", Gtk.main_quit)
+    win.show_all()
+    Gtk.main()
