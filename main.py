@@ -1,16 +1,18 @@
-import configparser
 from shutil import copyfile
 from os.path import exists
+import configparser
 import argparse
 import db
 import cli
 import app
 
-DEBUG = False
 args = None
 
 
 def main():
+    """
+    Bootstrap the program
+    """
     config = configparser.ConfigParser()
     config.read("config.ini")
 
@@ -47,6 +49,5 @@ parser.add_argument("-d", "--debug", help="use debug", action="store_true")
 parser.add_argument("-n", "--no-backup", help="do not use backup", action="store_true")
 args = parser.parse_args()
 
-DEBUG = args.debug
 
 main()
