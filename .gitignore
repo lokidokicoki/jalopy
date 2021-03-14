@@ -2,3 +2,4 @@
 jalopy.db
 .*.swp
 __pycache__
+config.ini
