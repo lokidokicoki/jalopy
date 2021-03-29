@@ -29,8 +29,8 @@ def main():
     else:
         print("Not using backup")
 
-    dbClient = dbclient.DBClient()
-    dbClient.createDatabase()
+    dbclient.init()
+    dbclient.createDatabase()
 
     # if cli
     if args.mode == "cli":
@@ -40,7 +40,7 @@ def main():
     else:
         print("Unknown mode, exiting")
 
-    dbClient.conn.close()
+    dbclient.conn.close()
 
     if args.no_backup is False:
         copyfile("jalopy.db", config["db"]["path"])

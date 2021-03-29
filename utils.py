@@ -1,4 +1,4 @@
-import db
+from db import dbclient
 
 litresPerGallon = 4.54609
 kmPerMile = 1.60934
@@ -26,8 +26,8 @@ def stats(vehicle):
     """
 
     # get all records for this vehicle
-    records = db.getRecords(vehicle["ID"])
-    types = db.getRecordTypes()
+    records = dbclient.records.get(vehicle["ID"])
+    types = dbclient.getRecordTypes()
     totalCost = 0
     avgMpg = 0
     avgKpl = 0

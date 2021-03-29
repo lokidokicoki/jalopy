@@ -1,5 +1,5 @@
 from PyInquirer import prompt, Separator
-import db
+from db import dbclient
 import utils
 
 
@@ -12,7 +12,9 @@ def getTypeChoices(requiredType):
     """
     Get 'type' records, either ruel or record based on 'requiredType'
     """
-    types = db.getFuelTypes() if requiredType == "fuel" else db.getRecordTypes()
+    types = (
+        dbclient.getFuelTypes() if requiredType == "fuel" else dbclient.getRecordTypes()
+    )
     choices = [{"name": i[1], "value": i[0]} for i in types]
 
     return choices
@@ -104,7 +106,7 @@ def selectVehicle():
     """
     Prompt user to select a vehicle
     """
-    allVehicles = db.getVehicles()
+    allVehicles = dbclient.vehicles.get()
 
     questions = [
         {
@@ -124,7 +126,7 @@ def selectRecord(vehicle):
     """
     Select a record for a specific vehicle
     """
-    allRecords = db.getRecords(vehicle["ID"])
+    allRecords = dbclient.records.get(vehicle["ID"])
 
     questions = [
         {
@@ -144,7 +146,7 @@ def recordForm(record=None):
     """
     Create/edit 'record'
     """
-    allVehicles = db.getVehicles()
+    allVehicles = dbclient.vehicles.get()
     questions = [
         {
             "type": "list",
@@ -222,7 +224,7 @@ def recordForm(record=None):
         print("{:0.2f} kpl".format(results["kpl"]))
         print("{:0.2f} l/100Km".format(results["l100"]))
 
-    db.addRecord(answers)
+    dbclient.records.add(answers)
 
 
 def vehicleForm(vehicle=None):
@@ -360,7 +362,7 @@ def vehicleForm(vehicle=None):
     if vehicle:
         answers["ID"] = vehicle["ID"]
 
-    return db.addVehicle(answers)
+    return dbclient.vehicles.add(answers)
 
 
 def mainMenu():
