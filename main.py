@@ -2,7 +2,11 @@ from shutil import copyfile
 from os.path import exists
 import configparser
 import argparse
-import db
+
+from db import dbclient
+
+# import db.DBClient
+# from db import *
 import cli
 import app
 
@@ -25,8 +29,8 @@ def main():
     else:
         print("Not using backup")
 
-    db.init()
-    db.createDB()
+    dbClient = dbclient.DBClient()
+    dbClient.createDatabase()
 
     # if cli
     if args.mode == "cli":
@@ -36,7 +40,7 @@ def main():
     else:
         print("Unknown mode, exiting")
 
-    db.conn.close()
+    dbClient.conn.close()
 
     if args.no_backup is False:
         copyfile("jalopy.db", config["db"]["path"])
