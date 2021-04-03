@@ -122,6 +122,11 @@ def selectVehicle():
     return next(x for x in allVehicles if x[0] == answers["opts"])
 
 
+def record_summary(record):
+    print(f"{record['DATE']}|{record['RECORD_TYPE_ID']}")
+    return record["DATE"]
+
+
 def selectRecord(vehicle):
     """
     Select a record for a specific vehicle
@@ -133,7 +138,9 @@ def selectRecord(vehicle):
             "type": "list",
             "name": "opts",
             "message": "Select record",
-            "choices": [{"name": i["DATE"], "value": i["ID"]} for i in allRecords],
+            "choices": [
+                {"name": record_summary(i), "value": i["ID"]} for i in allRecords
+            ],
         }
     ]
 
