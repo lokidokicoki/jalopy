@@ -4,8 +4,12 @@ Simple fuel economy and maintenance cost tracking tool for multiple vehicles.
 
 ## Installation
 
+Use a virtual environment, I recommend `pyenv`.
+
+With the virtual environment created run the following:
+
 ```
-pip3 install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Example config
