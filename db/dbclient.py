@@ -9,7 +9,9 @@ cursor = None
 
 def init():
     global conn, cursor
-    conn = sqlite3.connect("jalopy.db")
+    conn = sqlite3.connect(
+        "jalopy.db", detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
+    )
     conn.row_factory = sqlite3.Row
     cursor = conn.cursor()
     vehicles.init(conn, cursor)
