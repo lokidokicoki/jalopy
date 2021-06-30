@@ -1,7 +1,6 @@
 import sqlite3
-from . import vehicles
-from . import records
 
+from . import records, vehicles
 
 conn = None
 cursor = None
