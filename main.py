@@ -1,3 +1,7 @@
+"""Main runner for the app.
+
+Will spin up the cli or gui based on passed args.
+"""
 from shutil import copyfile
 from os.path import exists
 import configparser
@@ -5,22 +9,18 @@ import argparse
 
 from db import dbclient
 
-# import db.DBClient
-# from db import *
 import cli
 import app
 
-args = None
 
-
-def main():
+def main(args_):
     """
     Bootstrap the program
     """
     config = configparser.ConfigParser()
     config.read("config.ini")
 
-    if args.no_backup is False:
+    if args_.no_backup is False:
         if exists(config["db"]["path"]):
             print("Shared DB exists")
             copyfile(config["db"]["path"], "jalopy.db")
@@ -33,16 +33,16 @@ def main():
     dbclient.createDatabase()
 
     # if cli
-    if args.mode == "cli":
+    if args_.mode == "cli":
         cli.main()
-    elif args.mode == "gui":
+    elif args_.mode == "gui":
         app.main()
     else:
         print("Unknown mode, exiting")
 
     dbclient.conn.close()
 
-    if args.no_backup is False:
+    if args_.no_backup is False:
         copyfile("jalopy.db", config["db"]["path"])
     print("Night night")
 
@@ -54,4 +54,4 @@ parser.add_argument("-n", "--no-backup", help="do not use backup", action="store
 args = parser.parse_args()
 
 
-main()
+main(args)
