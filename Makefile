@@ -1,4 +1,7 @@
+PY_FILES := ${wildcard **/*.py}
+
 lint:
-	isort **/*.py
-	flake8 **/*.py
-	pylint **/*.py
+	-isort ${PY_FILES}
+	-flake8 ${PY_FILES}
+	-pylint ${PY_FILES}
+	-mypy ${PY_FILES}
