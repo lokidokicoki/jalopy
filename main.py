@@ -7,10 +7,10 @@ from os.path import exists
 import configparser
 import argparse
 
-from db import dbclient
+from db.dbclient import DatabaseClient
 
-import cli
-import app
+from ui import Cli, Gui
+import utils
 
 
 def main(args_):
@@ -29,16 +29,22 @@ def main(args_):
     else:
         print("Not using backup")
 
-    dbclient.init()
-    dbclient.createDatabase()
+    dbclient = DatabaseClient("jalopy.db")
+    dbclient.create_database()
+
+    utils.set_dbclient(dbclient)
 
     # if cli
+    user_interface = None
     if args_.mode == "cli":
-        cli.main()
+        user_interface = Cli(dbclient)
     elif args_.mode == "gui":
-        app.main()
+        user_interface = Gui(dbclient)
     else:
         print("Unknown mode, exiting")
+        exit()
+
+    user_interface.main()
 
     dbclient.conn.close()
 
