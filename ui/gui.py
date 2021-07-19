@@ -3,6 +3,10 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
+from db.dbclient import DatabaseClient
+
+from .base_ui import BaseUI
+
 
 class MainWindow(Gtk.Window):
     def __init__(self):
@@ -16,8 +20,12 @@ class MainWindow(Gtk.Window):
         print("boop")
 
 
-def main():
-    win = MainWindow()
-    win.connect("destroy", Gtk.main_quit)
-    win.show_all()
-    Gtk.main()
+class Gui(BaseUI):
+    def __init__(self, db_client: DatabaseClient = None):
+        super().__init__(db_client)
+
+    def main(self):
+        win = MainWindow()
+        win.connect("destroy", Gtk.main_quit)
+        win.show_all()
+        Gtk.main()
