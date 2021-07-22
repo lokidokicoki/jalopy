@@ -7,4 +7,3 @@ class BaseEntity:
     """Base entity"""
 
     entity_id: int
-    notes: str

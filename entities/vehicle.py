@@ -23,4 +23,3 @@ class VehicleEntity:
     tyre_size_rear: str
     tyre_pressure_front: float
     tyre_pressure_rear: float
-    notes: str

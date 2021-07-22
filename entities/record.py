@@ -2,13 +2,12 @@
 from dataclasses import dataclass
 from datetime import date
 
-from .base_entity import BaseEntity
-
 
 @dataclass
-class RecordEntity(BaseEntity):
+class RecordEntity:
     """RecordEntity"""
 
+    entity_id: int
     vehicle_id: int
     record_type_id: int
     record_date: date
@@ -16,3 +15,4 @@ class RecordEntity(BaseEntity):
     trip: float
     cost: float
     item_count: float
+    notes: str
