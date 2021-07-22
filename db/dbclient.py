@@ -17,8 +17,8 @@ class DatabaseClient:
         )
         self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
-        vehicles.init(self.conn, self.cursor)
-        records.init(self.conn, self.cursor)
+        self.vehicles = vehicles.Vehicles(self.conn, self.cursor)
+        self.records = records.Records(self.conn, self.cursor)
 
     def create_database(self):
         """
