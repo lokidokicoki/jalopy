@@ -5,8 +5,8 @@ Command line interface
 from PyInquirer import Separator, prompt
 
 import utils
+from entities.entity_manager import EntityManager
 
-from db.dbclient import DatabaseClient
 from .base_ui import BaseUI
 
 
@@ -17,8 +17,8 @@ class Cli(BaseUI):
 
     is_running = True
 
-    def __init__(self, db_client: DatabaseClient = None):
-        super().__init__(db_client)
+    def __init__(self, entity_manager: EntityManager = None):
+        super().__init__(entity_manager)
 
     def get_type_choices(self, required_type):
         """
@@ -99,15 +99,15 @@ class Cli(BaseUI):
         elif answers["opts"] == "stats":
             print("\nStats for vehicle")
             vehicle = self.select_vehicle()
-            results = utils.stats(vehicle)
+            results = self.utils.stats(vehicle)
             print("Record counts:")
             for i in results["counts"]:
                 print("{}: {}".format(i["name"], i["count"]))
             print("----")
-            print("Avg. MPG: {:0.2f}".format(results["avgMpg"]))
-            print("Avg. km/l: {:0.2f}".format(results["avgKpl"]))
-            print("Avg. l/100Km: {:0.2f}".format(results["avgL100"]))
-            print("Total cost: {:0.2f}".format(results["totalCost"]))
+            print("Avg. MPG: {:0.2f}".format(results["avg_mpg"]))
+            print("Avg. km/l: {:0.2f}".format(results["avg_km_per_litre"]))
+            print("Avg. l/100Km: {:0.2f}".format(results["avg_l100"]))
+            print("Total cost: {:0.2f}".format(results["total_cost"]))
         elif answers["opts"] == "remove":
             print("TBD: remove vehicle")
         else:
@@ -117,20 +117,22 @@ class Cli(BaseUI):
         """
         Prompt user to select a vehicle
         """
-        all_vehicles = self.db_client.vehicles.get()
+        all_vehicles = self.entity_manager.vehicles  # self.db_client.vehicles.get()
 
         questions = [
             {
                 "type": "list",
                 "name": "opts",
                 "message": "Select vehicle",
-                "choices": [{"name": i[1], "value": i[0]} for i in all_vehicles],
+                "choices": [
+                    {"name": i.reg_no, "value": i.entity_id} for i in all_vehicles
+                ],
             }
         ]
 
         answers = prompt(questions)
 
-        return next(x for x in all_vehicles if x[0] == answers["opts"])
+        return next(x for x in all_vehicles if x.entity_id == answers["opts"])
 
     def record_summary(self, record):
         """

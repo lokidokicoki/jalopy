@@ -3,7 +3,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from db.dbclient import DatabaseClient
+from entities.entity_manager import EntityManager
 
 from .base_ui import BaseUI
 
@@ -21,8 +21,8 @@ class MainWindow(Gtk.Window):
 
 
 class Gui(BaseUI):
-    def __init__(self, db_client: DatabaseClient = None):
-        super().__init__(db_client)
+    def __init__(self, entity_manager: EntityManager = None):
+        super().__init__(entity_manager)
 
     def main(self):
         win = MainWindow()
