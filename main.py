@@ -8,6 +8,8 @@ import configparser
 import argparse
 
 from db.dbclient import DatabaseClient
+from entities.entity_manager import EntityManager
+
 
 from ui import Cli, Gui
 import utils
@@ -30,19 +32,22 @@ def main(args_):
         print("Not using backup")
 
     dbclient = DatabaseClient("jalopy.db")
+    # TODO: move to ctor
     dbclient.create_database()
 
-    utils.set_dbclient(dbclient)
+    entity_manager = EntityManager(dbclient)
+
+    entity_manager.load()
 
     # if cli
     user_interface = None
     if args_.mode == "cli":
-        user_interface = Cli(dbclient)
+        user_interface = Cli(entity_manager)
     elif args_.mode == "gui":
-        user_interface = Gui(dbclient)
+        user_interface = Gui(entity_manager)
     else:
-        print("Unknown mode, exiting")
-        exit()
+        print("Unknown mode, fallback to cli")
+        user_interface = Cli(entity_manager)
 
     user_interface.main()
 
