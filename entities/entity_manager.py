@@ -83,7 +83,7 @@ class EntityManager:
         for x in self.dbclient.get_fuel_types():
             self.add(FuelType(x["id"], x["name"]))
 
-        for x in self.dbclient.vehicles.get():
+        for x in self.dbclient.vehicle.get():
             self.add(
                 VehicleEntity(
                     x["id"],
@@ -105,7 +105,7 @@ class EntityManager:
                 )
             )
 
-        for x in self.dbclient.records.get():
+        for x in self.dbclient.record.get():
             self.add(
                 RecordEntity(
                     x["id"],
