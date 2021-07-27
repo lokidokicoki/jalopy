@@ -4,8 +4,8 @@ Command line interface
 
 from PyInquirer import Separator, prompt
 
-import utils
-from entities.entity_manager import EntityManager
+from entities import EntityManager, RecordEntity
+import datetime
 
 from .base_ui import BaseUI
 
@@ -25,9 +25,9 @@ class Cli(BaseUI):
         Get 'type' records, either ruel or record based on 'required_type'
         """
         types = (
-            self.entity_manager.get_fuel_types()
+            self.entity_manager.fuel_types
             if required_type == "fuel"
-            else self.entity_manager.get_record_types()
+            else self.entity_manager.record_types
         )
         choices = [{"name": i.name, "value": i.entity_id} for i in types]
 
@@ -134,19 +134,19 @@ class Cli(BaseUI):
 
         return next(x for x in all_vehicles if x.entity_id == answers["opts"])
 
-    def record_summary(self, record):
+    @staticmethod
+    def record_summary(record):
         """
         Print summary of record
         """
-        print(f"{record.record_date}|{record.record_type_id}")
-        return record.record_date
+        return f"{record.record_date}|{record.record_type_id}"
 
     def select_record(self, vehicle):
         """
         Select a record for a specific vehicle
         """
         all_records = self.entity_manager.get_records_for_vehicle(vehicle.entity_id)
-        # records.get(vehicle["ID"])
+        # records.get(vehicle["id"])
 
         questions = [
             {
@@ -162,71 +162,73 @@ class Cli(BaseUI):
 
         answers = prompt(questions)
 
-        return next(x for x in all_records if x[0] == answers["opts"])
+        return next(x for x in all_records if x.entity_id == answers["opts"])
 
     def record_form(self, record=None):
         """
         Create/edit 'record'
         """
-        all_vehicles = self.db_client.vehicles.get()
+        print("record_form")
+        all_vehicles = self.entity_manager.vehicles
         if record:
-            print(record["VEHICLE_ID"])
-            print(record["RECORD_TYPE_ID"])
-            print(record["DATE"])
+            print(record)
+
         questions = [
             {
                 "type": "list",
-                "name": "VEHICLE_ID",
+                "name": "vehicle_id",
                 "message": "Reg. No.:",
-                "default": record["VEHICLE_ID"] if record else "",
-                "choices": [{"name": i[1], "value": i[0]} for i in all_vehicles],
+                "default": record.vehicle_id if record else "",
+                "choices": [
+                    {"name": i.reg_no, "value": i.entity_id} for i in all_vehicles
+                ],
             },
             {
                 "type": "list",
-                "name": "RECORD_TYPE_ID",
+                "name": "record_type_id",
                 "message": "Type",
-                "default": record["RECORD_TYPE_ID"] if record else "",
+                "default": record.record_type_id if record else "",
                 "choices": self.get_type_choices("record"),
             },
             {
                 "type": "input",
-                "name": "DATE",
+                "name": "record_date",
                 "message": "Date",
-                "default": record["DATE"] if record else "",
+                "default": record.record_date.strftime("%Y/%m/%d") if record else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "ODOMETER",
+                "name": "odometer",
                 "message": "Odometer",
-                "default": str(record["ODOMETER"]) if record else "",
+                "default": str(record.odometer) if record else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "TRIP",
+                "name": "trip",
                 "message": "Trip (optional)",
-                "default": str(record["TRIP"]) if record else "0",
+                "default": str(record.trip) if record else "0",
             },
             {
                 "type": "input",
-                "name": "COST",
+                "name": "cost",
                 "message": "Cost",
-                "default": str(record["COST"]) if record else "",
+                "default": str(record.cost) if record else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "ITEM_COUNT",
+                "name": "item_count",
                 "message": "Item Count",
-                "default": str(record["ITEM_COUNT"]) if record else "1",
+                "default": str(record.item_count) if record else "1",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "NOTES",
+                "name": "notes",
                 "message": "Notes (optional)",
-                "default": record["NOTES"] if record else "",
+                "default": record.notes if record else "",
             },
         ]
 
@@ -234,23 +236,44 @@ class Cli(BaseUI):
 
         # process, then saveo
         if record:
-            answers["ID"] = record["ID"]
+            record.record_type_id = int(answers["record_type_id"])
+            record.record_date = (
+                datetime.datetime.strptime(answers["record_date"], "%Y/%m/%d").date(),
+            )
+            record.odometer = int(answers["odometer"])
+            record.trip = float(answers["trip"])
+            record.cost = float(answers["cost"])
+            record.item_count = float(answers["item_count"])
+            print("todo: save updated record")
+        else:
+            record = RecordEntity(
+                -1,
+                int(answers["vehicle_id"]),
+                int(answers["record_type_id"]),
+                datetime.datetime.strptime(answers["record_date"], "%Y/%m/%d").date(),
+                int(answers["odometer"]),
+                float(answers["trip"]),
+                float(answers["cost"]),
+                float(answers["item_count"]),
+                answers["notes"],
+            )
+            print("todo: add new record and save to db")
 
-        answers["VEHICLE_ID"] = int(answers["VEHICLE_ID"])
-        answers["RECORD_TYPE_ID"] = int(answers["RECORD_TYPE_ID"])
-        answers["ODOMETER"] = int(answers["ODOMETER"])
-        answers["TRIP"] = float(answers["TRIP"])
-        answers["COST"] = float(answers["COST"])
-        answers["ITEM_COUNT"] = float(answers["ITEM_COUNT"])
+        # answers["vehicle_id"] = int(answers["vehicle_id"])
+        # answers["record_type_id"] = int(answers["record_type_id"])
+        # answers["odometer"] = int(answers["odometer"])
+        # answers["trip"] = float(answers["trip"])
+        # answers["cost"] = float(answers["cost"])
+        # answers["item_count"] = float(answers["item_count"])
 
         # if it is a fuel record, calculate & display the fuel economy
-        if answers["RECORD_TYPE_ID"] == 1:
-            results = utils.calculate_economy(answers)
+        if answers["record_type_id"] == 1:
+            results = self.utils.calculate_economy(record)
             print("{:0.2f} mpg".format(results["mpg"]))
             print("{:0.2f} kpl".format(results["kpl"]))
             print("{:0.2f} l/100Km".format(results["l100"]))
 
-        self.db_client.records.add(answers)
+        # self.entity_manager.records.add(answers)
 
     def vehicle_form(self, vehicle=None):
         """
@@ -259,112 +282,112 @@ class Cli(BaseUI):
         questions = [
             {
                 "type": "input",
-                "name": "REG_NO",
+                "name": "reg_no",
                 "message": "Reg. No.:",
-                "default": vehicle["REG_NO"] if vehicle else "",
+                "default": vehicle.reg_no if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "MAKE",
+                "name": "make",
                 "message": "Make",
-                "default": vehicle["MAKE"] if vehicle else "",
+                "default": vehicle.make if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "MODEL",
+                "name": "model",
                 "message": "Model",
-                "default": vehicle["MODEL"] if vehicle else "",
+                "default": vehicle.model if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "YEAR",
+                "name": "year",
                 "message": "Year",
-                "default": str(vehicle["YEAR"]) if vehicle else "",
+                "default": str(vehicle.year) if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "PURCHASE_DATE",
+                "name": "purchase_date",
                 "message": "Purchase Date",
-                "default": vehicle["PURCHASE_DATE"] if vehicle else "",
+                "default": vehicle.purchase_date if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "PURCHASE_PRICE",
+                "name": "purchase_price",
                 "message": "Purchase Price",
-                "default": str(vehicle["PURCHASE_PRICE"]) if vehicle else "",
+                "default": str(vehicle.purchase_price) if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "PURCHASE_ODOMETER",
+                "name": "purchase_odometer",
                 "message": "Purchase Odometer",
-                "default": str(vehicle["PURCHASE_ODOMETER"]) if vehicle else "",
+                "default": str(vehicle.purchase_odometer) if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "list",
-                "name": "FUEL_TYPE_ID",
+                "name": "fuel_type_id",
                 "message": "Fuel type",
                 "choices": self.get_type_choices("fuel"),
-                "default": vehicle["FUEL_TYPE_ID"] if vehicle else "",
+                "default": vehicle.fuel_type_id if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "FUEL_CAPACITY",
+                "name": "fuel_capacity",
                 "message": "Fuel Capacity (ltr)",
-                "default": str(vehicle["FUEL_CAPACITY"]) if vehicle else "",
+                "default": str(vehicle.fuel_capacity) if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "OIL_TYPE",
+                "name": "oil_type",
                 "message": "Oil Type",
-                "default": vehicle["OIL_TYPE"] if vehicle else "",
+                "default": vehicle.oil_type if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "OIL_CAPACITY",
+                "name": "oil_capacity",
                 "message": "Oil Capacity (ltr)",
-                "default": str(vehicle["OIL_CAPACITY"]) if vehicle else "",
+                "default": str(vehicle.oil_capacity) if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "TYRE_SIZE_FRONT",
+                "name": "tyre_size_front",
                 "message": "Tyre size front",
-                "default": vehicle["TYRE_SIZE_FRONT"] if vehicle else "",
+                "default": vehicle.tyre_size_front if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "TYRE_PRESSURE_FRONT",
+                "name": "tyre_pressure_front",
                 "message": "Tyre pressure front",
-                "default": str(vehicle["TYRE_PRESSURE_FRONT"]) if vehicle else "",
+                "default": str(vehicle.tyre_pressure_front) if vehicle else "",
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "TYRE_SIZE_REAR",
+                "name": "tyre_size_rear",
                 "message": "Tyre size rear",
-                "default": lambda x: vehicle["TYRE_SIZE_REAR"]
+                "default": lambda x: vehicle.tyre_size_rear
                 if vehicle
-                else x["TYRE_SIZE_FRONT"],
+                else x.tyre_size_front,
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
             {
                 "type": "input",
-                "name": "TYRE_PRESSURE_REAR",
+                "name": "tyre_pressure_rear",
                 "message": "Tyre pressure rear",
-                "default": lambda x: str(vehicle["TYRE_PRESSURE_REAR"])
+                "default": lambda x: str(vehicle.tyre_pressure_rear)
                 if vehicle
-                else x["TYRE_PRESSURE_FRONT"],
+                else x.tyre_pressure_front,
                 "validate": lambda val: len(val) != 0 or "Please supply a value",
             },
         ]
@@ -372,22 +395,22 @@ class Cli(BaseUI):
         answers = prompt(questions)
 
         # process, then save
-        answers["REG_NO"] = answers["REG_NO"].upper()
-        answers["MAKE"] = answers["MAKE"].lower().capitalize()
-        answers["MODEL"] = answers["MODEL"].lower().capitalize()
-        answers["YEAR"] = int(answers["YEAR"])
-        answers["PURCHASE_PRICE"] = float(answers["PURCHASE_PRICE"])
-        answers["PURCHASE_ODOMETER"] = int(answers["PURCHASE_ODOMETER"])
-        answers["FUEL_CAPACITY"] = float(answers["FUEL_CAPACITY"])
-        answers["OIL_CAPACITY"] = float(answers["OIL_CAPACITY"])
-        answers["FUEL_TYPE_ID`"] = int(answers["FUEL_TYPE_ID"])
-        answers["TYRE_PRESSURE_FRONT`"] = float(answers["TYRE_PRESSURE_FRONT"])
-        answers["TYRE_PRESSURE_REAR`"] = float(answers["TYRE_PRESSURE_REAR"])
+        answers["reg_no"] = answers["reg_no"].upper()
+        answers["make"] = answers["make"].lower().capitalize()
+        answers["model"] = answers["model"].lower().capitalize()
+        answers["year"] = int(answers["year"])
+        answers["purchase_price"] = float(answers["purchase_price"])
+        answers["purchase_odometer"] = int(answers["purchase_odometer"])
+        answers["fuel_capacity"] = float(answers["fuel_capacity"])
+        answers["oil_capacity"] = float(answers["oil_capacity"])
+        answers["fuel_type_id`"] = int(answers["fuel_type_id"])
+        answers["tyre_pressure_front`"] = float(answers["tyre_pressure_front"])
+        answers["tyre_pressure_rear`"] = float(answers["tyre_pressure_rear"])
 
         if vehicle:
-            answers["ID"] = vehicle["ID"]
+            answers["id"] = vehicle.id
 
-        return self.db_client.vehicles.add(answers)
+        return self.entity_manager.vehicles.add(answers)
 
     def show_main_menu(self):
         """
