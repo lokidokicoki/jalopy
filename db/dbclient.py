@@ -3,7 +3,7 @@ Database client
 """
 import sqlite3
 
-from . import records, vehicles
+from . import record, vehicle
 
 
 class DatabaseClient:
@@ -17,8 +17,8 @@ class DatabaseClient:
         )
         self.conn.row_factory = sqlite3.Row
         self.cursor = self.conn.cursor()
-        self.vehicles = vehicles.Vehicles(self.conn, self.cursor)
-        self.records = records.Records(self.conn, self.cursor)
+        self.vehicle = vehicle.Vehicle(self.conn, self.cursor)
+        self.record = record.Record(self.conn, self.cursor)
 
     def create_database(self):
         """

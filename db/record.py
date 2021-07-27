@@ -3,7 +3,7 @@
 from db.base_item import BaseItem
 
 
-class Records(BaseItem):
+class Record(BaseItem):
     """
     DB access for the 'record' table
     """

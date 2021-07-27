@@ -1,7 +1,8 @@
+"""Interface to the 'vehicle' table."""
 from db.base_item import BaseItem
 
 
-class Vehicles(BaseItem):
+class Vehicle(BaseItem):
     def get(self):
         self.cursor.execute(
             """
