@@ -4,15 +4,21 @@ from db.base_item import BaseItem
 
 
 class Records(BaseItem):
+    """
+    DB access for the 'record' table
+    """
+
     def get(self, vehicle_id=None):
-        sql = """
-        SELECT * FROM RECORDS
         """
+        Get all or single vehicle from table.
+
+        """
+        sql = "SELECT * FROM record"
 
         if vehicle_id:
-            sql = sql + " where VEHICLE_ID=:VEHICLE_ID"
+            sql = sql + " WHERE vehicle_id=:vehicle_id"
 
-        self.cursor.execute(sql, {"VEHICLE_ID": vehicle_id})
+        self.cursor.execute(sql, {"vehicle_id": vehicle_id})
 
         return self.cursor.fetchall()
 
@@ -20,38 +26,38 @@ class Records(BaseItem):
         """
         Add/amend record
         """
-        if "ID" in record:
+        if "id" in record:
             sql = """
-                UPDATE RECORDS SET
-                VEHICLE_ID=:VEHICLE_ID,
-                RECORD_TYPE_ID=:RECORD_TYPE_ID,
-                DATE=:DATE,
-                ODOMETER=:ODOMETER,
-                TRIP=:TRIP,
-                COST=:COST,
-                ITEM_COUNT=:ITEM_COUNT,
-                NOTES=:NOTES
-            WHERE ID=:ID
+                UPDATE record SET
+                vehicle_id=:vehicle_id,
+                record_type_id=:record_type_id,
+                date=:date,
+                odometer=:odometer,
+                trip=:trip,
+                cost=:cost,
+                item_count=:item_count,
+                notes=:notes
+            WHERE id=:id
             """
         else:
-            sql = """INSERT INTO RECORDS (
-                    VEHICLE_ID,
-                    RECORD_TYPE_ID,
-                    DATE,
-                    ODOMETER,
-                    TRIP,
-                    COST,
-                    ITEM_COUNT,
-                    NOTES
+            sql = """INSERT INTO record (
+                    vehicle_id,
+                    record_type_id,
+                    date,
+                    odometer,
+                    trip,
+                    cost,
+                    item_count,
+                    notes
                 ) VALUES (
-                    :VEHICLE_ID,
-                    :RECORD_TYPE_ID,
-                    :DATE,
-                    :ODOMETER,
-                    :TRIP,
-                    :COST,
-                    :ITEM_COUNT,
-                    :NOTES
+                    :vehicle_id,
+                    :record_type_id,
+                    :date,
+                    :odometer,
+                    :trip,
+                    :cost,
+                    :item_count,
+                    :notes
             )"""
 
         self.cursor.execute(sql, record)

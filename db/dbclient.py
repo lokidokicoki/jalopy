@@ -27,64 +27,64 @@ class DatabaseClient:
         sql = "SELECT name from sqlite_master WHERE type='table' and name=?"
 
         # test for vehicles vehicle
-        self.cursor.execute(sql, ["VEHICLES"])
+        self.cursor.execute(sql, ["vehicle"])
         result = self.cursor.fetchone()
 
         if result is None:
             print("create jalopy.db tables")
             self.cursor.executescript(
                 """
-                CREATE TABLE VEHICLES(
-                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    REG_NO CHAR(10) NOT NULL,
-                    MAKE TEXT NOT NULL,
-                    MODEL TEXT NOT NULL,
-                    YEAR INTEGER NOT NULL,
-                    PURCHASE_DATE TEXT,
-                    PURCHASE_PRICE REAL,
-                    PURCHASE_ODOMETER INTEGER,
-                    FUEL_TYPE_ID INTEGER NOT NULL,
-                    FUEL_CAPACITY REAL,
-                    OIL_TYPE TEXT,
-                    OIL_CAPACITY REAL,
-                    TYRE_SIZE_FRONT TEXT,
-                    TYRE_SIZE_REAR TEXT,
-                    TYRE_PRESSURE_FRONT REAL,
-                    TYRE_PRESSURE_REAR REAL
+                CREATE TABLE vehicle(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    reg_no CHAR(10) NOT NULL,
+                    make TEXT NOT NULL,
+                    model TEXT NOT NULL,
+                    year INTEGER NOT NULL,
+                    purchase_date TEXT,
+                    purchase_price REAL,
+                    purchase_odometer INTEGER,
+                    fuel_type_id INTEGER NOT NULL,
+                    fuel_capacity REAL,
+                    oil_type TEXT,
+                    oil_capacity REAL,
+                    tyre_size_front TEXT,
+                    tyre_size_rear TEXT,
+                    tyre_pressure_front REAL,
+                    tyre_pressure_rear REAL
                 );
 
-                CREATE TABLE FUEL_TYPES(
-                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    NAME TEXT NOT NULL
+                CREATE TABLE fuel_type(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL
                 );
 
-                INSERT INTO FUEL_TYPES(NAME) VALUES('Unleaded');
-                INSERT INTO FUEL_TYPES(NAME) VALUES('Super Unleaded');
-                INSERT INTO FUEL_TYPES(NAME) VALUES('Diesel');
-                INSERT INTO FUEL_TYPES(NAME) VALUES('Super Diesel');
+                INSERT INTO fuel_type(name) VALUES('Unleaded');
+                INSERT INTO fuel_type(name) VALUES('Super Unleaded');
+                INSERT INTO fuel_type(name) VALUES('Diesel');
+                INSERT INTO fuel_type(name) VALUES('Super Diesel');
 
-                CREATE TABLE RECORDS(
-                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    VEHICLE_ID INTEGER NOT NULL,
-                    RECORD_TYPE_ID INTEGER NOT NULL,
-                    DATE TEXT NOT NULL,
-                    ODOMETER INTEGER NOT NULL,
-                    TRIP REAL,
-                    COST REAL NOT NULL,
-                    ITEM_COUNT REAL,
-                    NOTES TEXT
+                CREATE TABLE records(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    vehicle_id INTEGER NOT NULL,
+                    record_type_id INTEGER NOT NULL,
+                    record_date TEXT NOT NULL,
+                    odometer INTEGER NOT NULL,
+                    trip REAL,
+                    cost REAL NOT NULL,
+                    item_count REAL,
+                    notes TEXT
                 );
 
-                CREATE TABLE RECORD_TYPES(
-                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
-                    NAME TEXT NOT NULL
+                CREATE TABLE record_type(
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    name TEXT NOT NULL
                 );
-                INSERT INTO RECORD_TYPES(NAME) VALUES('Fuel');
-                INSERT INTO RECORD_TYPES(NAME) VALUES('Service');
-                INSERT INTO RECORD_TYPES(NAME) VALUES('Maintenance');
-                INSERT INTO RECORD_TYPES(NAME) VALUES('Tax');
-                INSERT INTO RECORD_TYPES(NAME) VALUES('Insurance');
-                INSERT INTO RECORD_TYPES(NAME) VALUES('M.O.T.');
+                INSERT INTO record_type(name) VALUES('Fuel');
+                INSERT INTO record_type(name) VALUES('Service');
+                INSERT INTO record_type(name) VALUES('Maintenance');
+                INSERT INTO record_type(name) VALUES('Tax');
+                INSERT INTO record_type(name) VALUES('Insurance');
+                INSERT INTO record_type(name) VALUES('M.O.T.');
                 """
             )
             self.conn.commit()
@@ -95,12 +95,12 @@ class DatabaseClient:
         """
         Get all record types
         """
-        self.cursor.execute("SELECT ID,NAME from RECORD_TYPES")
+        self.cursor.execute("SELECT id,name FROM record_type")
         return self.cursor.fetchall()
 
     def get_fuel_types(self):
         """
         Get fuel types
         """
-        self.cursor.execute("SELECT ID,NAME from FUEL_TYPES")
+        self.cursor.execute("SELECT id,name FROM fuel_type")
         return self.cursor.fetchall()
