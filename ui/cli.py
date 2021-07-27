@@ -25,11 +25,11 @@ class Cli(BaseUI):
         Get 'type' records, either ruel or record based on 'required_type'
         """
         types = (
-            self.db_client.get_fuel_types()
+            self.entity_manager.get_fuel_types()
             if required_type == "fuel"
-            else self.db_client.get_record_types()
+            else self.entity_manager.get_record_types()
         )
-        choices = [{"name": i[1], "value": i[0]} for i in types]
+        choices = [{"name": i.name, "value": i.entity_id} for i in types]
 
         return choices
 
@@ -138,14 +138,15 @@ class Cli(BaseUI):
         """
         Print summary of record
         """
-        print(f"{record['DATE']}|{record['RECORD_TYPE_ID']}")
-        return record["DATE"]
+        print(f"{record.record_date}|{record.record_type_id}")
+        return record.record_date
 
     def select_record(self, vehicle):
         """
         Select a record for a specific vehicle
         """
-        all_records = self.db_client.records.get(vehicle["ID"])
+        all_records = self.entity_manager.get_records_for_vehicle(vehicle.entity_id)
+        # records.get(vehicle["ID"])
 
         questions = [
             {
@@ -153,7 +154,7 @@ class Cli(BaseUI):
                 "name": "opts",
                 "message": "Select record",
                 "choices": [
-                    {"name": self.record_summary(i), "value": i["ID"]}
+                    {"name": self.record_summary(i), "value": i.entity_id}
                     for i in all_records
                 ],
             }
