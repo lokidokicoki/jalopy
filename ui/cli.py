@@ -2,12 +2,13 @@
 Command line interface
 """
 
+import datetime
+
 # from PyInquirer import Separator, prompt
 import inquirer
 from inquirer import errors
 
 from entities import EntityManager, RecordEntity, VehicleEntity
-import datetime
 
 from .base_ui import BaseUI
 

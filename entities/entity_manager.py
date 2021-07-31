@@ -1,16 +1,16 @@
 """Entity Manager"""
 
+import datetime
+from dataclasses import asdict
 from enum import Enum
 from typing import List, Union
 
 from db.dbclient import DatabaseClient
 
-import datetime
-from .record import RecordEntity
-from .vehicle import VehicleEntity
-from .record_type import RecordType
 from .fuel_type import FuelType
-from dataclasses import asdict
+from .record import RecordEntity
+from .record_type import RecordType
+from .vehicle import VehicleEntity
 
 
 class EntityType(Enum):
