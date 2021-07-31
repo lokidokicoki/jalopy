@@ -8,7 +8,7 @@ import datetime
 import inquirer
 from inquirer import errors
 
-from entities import EntityManager, RecordEntity, VehicleEntity
+from entities import EntityManager, EntityType, RecordEntity, VehicleEntity
 
 from .base_ui import BaseUI
 
@@ -167,12 +167,14 @@ class Cli(BaseUI):
 
         return next(x for x in all_vehicles if x.uid == int(answers["opts"]))
 
-    @staticmethod
-    def record_summary(record):
+    def record_summary(self, record):
         """
         Print summary of record
         """
-        return f"{record.record_date}|{record.record_type_id}"
+        record_type = self.entity_manager.get(
+            EntityType.RECORD_TYPE, record.record_type_id
+        )
+        return f"{record.record_date} | {record_type.name} | {record.notes}"
 
     def select_record(self, vehicle):
         """
