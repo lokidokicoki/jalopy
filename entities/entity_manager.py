@@ -10,6 +10,7 @@ from .record import RecordEntity
 from .vehicle import VehicleEntity
 from .record_type import RecordType
 from .fuel_type import FuelType
+from dataclasses import asdict
 
 
 class EntityType(Enum):
@@ -54,8 +55,10 @@ class EntityManager:
         """Get records for a specific vehicle"""
         if vehicle_id is None:
             raise TypeError("get_records_for_vehicle missing entity_id")
-        print(self.records)
-        return [x for x in self.records if x.vehicle_id == vehicle_id]
+        # print(self.records)
+        return [
+            x for x in self.records if x.vehicle_id == vehicle_id and x.archived == 0
+        ]
 
     def add(self, entity: Union[VehicleEntity, RecordEntity, RecordType, FuelType]):
         """Add an entity to the relevant collection
@@ -83,7 +86,7 @@ class EntityManager:
         for row in self.dbclient.get_fuel_types():
             self.add(FuelType(row["uid"], row["name"]))
 
-        for row in self.dbclient.vehicle.get():
+        for row in self.dbclient.vehicle.read():
             self.add(
                 VehicleEntity(
                     row["uid"],
@@ -92,7 +95,7 @@ class EntityManager:
                     row["model"],
                     row["year"],
                     row["purchase_price"],
-                    row["purchase_date"],
+                    datetime.date.fromisoformat(row["purchase_date"]),
                     row["purchase_odometer"],
                     row["fuel_type_id"],
                     row["fuel_capacity"],
@@ -102,23 +105,43 @@ class EntityManager:
                     row["tyre_size_rear"],
                     row["tyre_pressure_front"],
                     row["tyre_pressure_rear"],
+                    row["archived"],
                 )
             )
 
-        for row in self.dbclient.record.get():
+        for row in self.dbclient.record.read():
             self.add(
                 RecordEntity(
                     row["uid"],
                     row["vehicle_id"],
                     row["record_type_id"],
-                    datetime.datetime.strptime(row["record_date"], "%Y/%m/%d").date(),
+                    datetime.date.fromisoformat(row["record_date"]),
                     int(row["odometer"]),
                     float(row["trip"]),
                     float(row["cost"]),
                     float(row["item_count"]),
                     row["notes"],
+                    row["archived"],
                 )
             )
 
     def save(self):
-        print("EM.save...")
+        for entity in self.vehicles:
+            if entity.uid == -1:
+                self.dbclient.vehicle.create(self.as_record(entity))
+            else:
+                self.dbclient.vehicle.update(self.as_record(entity))
+
+        for entity in self.records:
+            if entity.uid == -1:
+                self.dbclient.record.create(self.as_record(entity))
+            else:
+                self.dbclient.record.update(self.as_record(entity))
+
+    @staticmethod
+    def as_record(entity):
+        record = asdict(entity)
+        for key in record.keys():
+            if isinstance(record[key], datetime.date):
+                record[key] = datetime.date.isoformat(record[key])
+        return record
