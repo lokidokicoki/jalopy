@@ -123,8 +123,8 @@ class Cli(BaseUI):
                 print("\nVehicle edited")
         elif answers["opts"] == "s":
             print("\nStats for vehicle")
+            vehicle = self.select_vehicle()
             if vehicle:
-                vehicle = self.select_vehicle()
                 results = self.utils.stats(vehicle)
                 print("Record counts:")
                 for i in results["counts"]:
