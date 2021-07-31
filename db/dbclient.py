@@ -34,7 +34,7 @@ class DatabaseClient:
             print("create jalopy.db tables")
             self.cursor.executescript(
                 """
-                CREATE TABLE vehicle(
+                CREATE TABLE IF NOT EXISTS vehicle(
                     uid INTEGER PRIMARY KEY AUTOINCREMENT,
                     reg_no CHAR(10) NOT NULL,
                     make TEXT NOT NULL,
@@ -50,10 +50,12 @@ class DatabaseClient:
                     tyre_size_front TEXT,
                     tyre_size_rear TEXT,
                     tyre_pressure_front REAL,
-                    tyre_pressure_rear REAL
+                    tyre_pressure_rear REAL,
+                    notes TEXT,
+                    archived INTEGER DEFAULT 0
                 );
 
-                CREATE TABLE fuel_type(
+                CREATE TABLE IF NOT EXISTS fuel_type(
                     uid INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL
                 );
@@ -63,7 +65,7 @@ class DatabaseClient:
                 INSERT INTO fuel_type(name) VALUES('Diesel');
                 INSERT INTO fuel_type(name) VALUES('Super Diesel');
 
-                CREATE TABLE records(
+                CREATE TABLE IF NOT EXISTS records(
                     uid INTEGER PRIMARY KEY AUTOINCREMENT,
                     vehicle_id INTEGER NOT NULL,
                     record_type_id INTEGER NOT NULL,
@@ -72,10 +74,11 @@ class DatabaseClient:
                     trip REAL,
                     cost REAL NOT NULL,
                     item_count REAL,
-                    notes TEXT
+                    notes TEXT,
+                    archived INTEGER DEFAULT 0
                 );
 
-                CREATE TABLE record_type(
+                CREATE TABLE IF NOT EXISTS record_type(
                     uid INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL
                 );

@@ -1,8 +1,11 @@
-"""Interface to the 'vehicle' table."""
+
 from db.base_item import BaseItem
 
 
 class Vehicle(BaseItem):
+    def __init__(self, conn, cursor):
+        super().__init__(conn, cursor, "vehicle")
+
     def get(self):
         self.cursor.execute(
             """
