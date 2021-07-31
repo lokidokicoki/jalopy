@@ -2,9 +2,11 @@
 Command line interface
 """
 
-from PyInquirer import Separator, prompt
+# from PyInquirer import Separator, prompt
+import inquirer
+from inquirer import errors
 
-from entities import EntityManager, RecordEntity
+from entities import EntityManager, RecordEntity, VehicleEntity
 import datetime
 
 from .base_ui import BaseUI
@@ -20,6 +22,20 @@ class Cli(BaseUI):
     def __init__(self, entity_manager: EntityManager = None):
         super().__init__(entity_manager)
 
+    @staticmethod
+    def get_default_tyre_size(answers):
+        return answers["tyre_size_front"]
+
+    @staticmethod
+    def get_default_tyre_pressure(answers):
+        return answers["tyre_pressure_front"]
+
+    @staticmethod
+    def check_length(answers, current):
+        print("check_len", answers, current)
+        if len(current) == 0:
+            raise errors.ValidationError("", reason="Please supply a value")
+
     def get_type_choices(self, required_type):
         """
         Get 'type' records, either ruel or record based on 'required_type'
@@ -29,7 +45,7 @@ class Cli(BaseUI):
             if required_type == "fuel"
             else self.entity_manager.record_types
         )
-        choices = [{"name": i.name, "value": i.entity_id} for i in types]
+        choices = [(i.name, str(i.uid)) for i in types]
 
         return choices
 
@@ -38,31 +54,29 @@ class Cli(BaseUI):
         CRUD ops for records
         """
         questions = [
-            {
-                "type": "list",
-                "name": "opts",
-                "message": "Records menu",
-                "choices": [
-                    {"name": "Add", "value": "add"},
-                    {"name": "Edit", "value": "edit"},
-                    {"name": "Remove", "value": "remove"},
-                    Separator(),
-                    {"name": "Back", "value": "back"},
+            inquirer.List(
+                "opts",
+                message="Records menu",
+                choices=[
+                    ("Add", "a"),
+                    ("Edit", "e"),
+                    ("Remove", "r"),
+                    ("Back", "b"),
                 ],
-            }
+            )
         ]
 
-        answers = prompt(questions)
+        answers = inquirer.prompt(questions)
 
-        if answers["opts"] == "add":
+        if answers["opts"] == "a":
             print("\nAdd record")
             self.record_form()
-        elif answers["opts"] == "edit":
+        elif answers["opts"] == "e":
             print("\nEdit record")
             vehicle = self.select_vehicle()
             record = self.select_record(vehicle)
             self.record_form(record)
-        elif answers["opts"] == "remove":
+        elif answers["opts"] == "r":
             print("TBD: remove vehicle")
         else:
             print("Return to main")
@@ -72,31 +86,29 @@ class Cli(BaseUI):
         CRUD ops for vehicles
         """
         questions = [
-            {
-                "type": "list",
-                "name": "opts",
-                "message": "Vehicle menu",
-                "choices": [
-                    {"name": "Add", "value": "add"},
-                    {"name": "Edit", "value": "edit"},
-                    {"name": "Remove", "value": "remove"},
-                    {"name": "Stats", "value": "stats"},
-                    Separator(),
-                    {"name": "Back", "value": "back"},
+            inquirer.List(
+                "opts",
+                message="Vehicle menu",
+                choices=[
+                    ("Add", "a"),
+                    ("Edit", "e"),
+                    ("Remove", "r"),
+                    ("Stats", "s"),
+                    ("Back", "b"),
                 ],
-            }
+            )
         ]
 
-        answers = prompt(questions)
+        answers = inquirer.prompt(questions)
 
-        if answers["opts"] == "add":
+        if answers["opts"] == "a":
             print("\nAdd vehicle")
             self.vehicle_form()
-        elif answers["opts"] == "edit":
+        elif answers["opts"] == "e":
             print("\nEdit vehicle")
             vehicle = self.select_vehicle()
             self.vehicle_form(vehicle)
-        elif answers["opts"] == "stats":
+        elif answers["opts"] == "s":
             print("\nStats for vehicle")
             vehicle = self.select_vehicle()
             results = self.utils.stats(vehicle)
@@ -108,7 +120,7 @@ class Cli(BaseUI):
             print("Avg. km/l: {:0.2f}".format(results["avg_km_per_litre"]))
             print("Avg. l/100Km: {:0.2f}".format(results["avg_l100"]))
             print("Total cost: {:0.2f}".format(results["total_cost"]))
-        elif answers["opts"] == "remove":
+        elif answers["opts"] == "r":
             print("TBD: remove vehicle")
         else:
             print("return to main")
@@ -120,19 +132,16 @@ class Cli(BaseUI):
         all_vehicles = self.entity_manager.vehicles  # self.db_client.vehicles.get()
 
         questions = [
-            {
-                "type": "list",
-                "name": "opts",
-                "message": "Select vehicle",
-                "choices": [
-                    {"name": i.reg_no, "value": i.entity_id} for i in all_vehicles
-                ],
-            }
+            inquirer.List(
+                "opts",
+                message="Select vehicle",
+                choices=[(i.reg_no, str(i.uid)) for i in all_vehicles],
+            )
         ]
 
-        answers = prompt(questions)
+        answers = inquirer.prompt(questions)
 
-        return next(x for x in all_vehicles if x.entity_id == answers["opts"])
+        return next(x for x in all_vehicles if x.uid == int(answers["opts"]))
 
     @staticmethod
     def record_summary(record):
@@ -145,24 +154,20 @@ class Cli(BaseUI):
         """
         Select a record for a specific vehicle
         """
-        all_records = self.entity_manager.get_records_for_vehicle(vehicle.entity_id)
+        all_records = self.entity_manager.get_records_for_vehicle(vehicle.uid)
         # records.get(vehicle["id"])
 
         questions = [
-            {
-                "type": "list",
-                "name": "opts",
-                "message": "Select record",
-                "choices": [
-                    {"name": self.record_summary(i), "value": i.entity_id}
-                    for i in all_records
-                ],
-            }
+            inquirer.List(
+                "opts",
+                message="Select record",
+                choices=[(self.record_summary(i), str(i.uid)) for i in all_records],
+            )
         ]
 
-        answers = prompt(questions)
+        answers = inquirer.prompt(questions)
 
-        return next(x for x in all_records if x.entity_id == answers["opts"])
+        return next(x for x in all_records if x.uid == int(answers["opts"]))
 
     def record_form(self, record=None):
         """
@@ -172,67 +177,59 @@ class Cli(BaseUI):
         all_vehicles = self.entity_manager.vehicles
         if record:
             print(record)
+            print(type(record.record_type_id))
+            print(self.get_type_choices("record"))
 
         questions = [
-            {
-                "type": "list",
-                "name": "vehicle_id",
-                "message": "Reg. No.:",
-                "default": record.vehicle_id if record else "",
-                "choices": [
-                    {"name": i.reg_no, "value": i.entity_id} for i in all_vehicles
-                ],
-            },
-            {
-                "type": "list",
-                "name": "record_type_id",
-                "message": "Type",
-                "default": record.record_type_id if record else "",
-                "choices": self.get_type_choices("record"),
-            },
-            {
-                "type": "input",
-                "name": "record_date",
-                "message": "Date",
-                "default": record.record_date.strftime("%Y/%m/%d") if record else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "odometer",
-                "message": "Odometer",
-                "default": str(record.odometer) if record else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "trip",
-                "message": "Trip (optional)",
-                "default": str(record.trip) if record else "0",
-            },
-            {
-                "type": "input",
-                "name": "cost",
-                "message": "Cost",
-                "default": str(record.cost) if record else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "item_count",
-                "message": "Item Count",
-                "default": str(record.item_count) if record else "1",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "notes",
-                "message": "Notes (optional)",
-                "default": record.notes if record else "",
-            },
+            inquirer.List(
+                "vehicle_id",
+                message="Reg. No.:",
+                default=str(record.vehicle_id) if record else "",
+                choices=[(i.reg_no, str(i.uid)) for i in all_vehicles],
+            ),
+            inquirer.List(
+                "record_type_id",
+                message="Type",
+                default=str(record.record_type_id) if record else "4",
+                choices=self.get_type_choices("record"),
+            ),
+            inquirer.Text(
+                "record_date",
+                message="Date",
+                default=record.record_date.strftime("%Y/%m/%d") if record else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "odometer",
+                message="Odometer",
+                default=str(record.odometer) if record else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "trip",
+                message="Trip (optional)",
+                default=str(record.trip) if record else "0",
+            ),
+            inquirer.Text(
+                "cost",
+                message="Cost",
+                default=str(record.cost) if record else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "item_count",
+                message="Item Count",
+                default=str(record.item_count) if record else "1",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "notes",
+                message="Notes (optional)",
+                default=record.notes if record else "",
+            ),
         ]
 
-        answers = prompt(questions)
+        answers = inquirer.prompt(questions)
 
         # process, then saveo
         if record:
@@ -258,6 +255,7 @@ class Cli(BaseUI):
                 answers["notes"],
             )
             print("todo: add new record and save to db")
+            self.entity_manager.records.add(answers)
 
         # answers["vehicle_id"] = int(answers["vehicle_id"])
         # answers["record_type_id"] = int(answers["record_type_id"])
@@ -267,132 +265,119 @@ class Cli(BaseUI):
         # answers["item_count"] = float(answers["item_count"])
 
         # if it is a fuel record, calculate & display the fuel economy
-        if answers["record_type_id"] == 1:
+        if int(answers["record_type_id"]) == 1:
             results = self.utils.calculate_economy(record)
             print("{:0.2f} mpg".format(results["mpg"]))
             print("{:0.2f} kpl".format(results["kpl"]))
             print("{:0.2f} l/100Km".format(results["l100"]))
-
-        # self.entity_manager.records.add(answers)
 
     def vehicle_form(self, vehicle=None):
         """
         Create/edit vehicle
         """
         questions = [
-            {
-                "type": "input",
-                "name": "reg_no",
-                "message": "Reg. No.:",
-                "default": vehicle.reg_no if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "make",
-                "message": "Make",
-                "default": vehicle.make if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "model",
-                "message": "Model",
-                "default": vehicle.model if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "year",
-                "message": "Year",
-                "default": str(vehicle.year) if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "purchase_date",
-                "message": "Purchase Date",
-                "default": vehicle.purchase_date if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "purchase_price",
-                "message": "Purchase Price",
-                "default": str(vehicle.purchase_price) if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "purchase_odometer",
-                "message": "Purchase Odometer",
-                "default": str(vehicle.purchase_odometer) if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "list",
-                "name": "fuel_type_id",
-                "message": "Fuel type",
-                "choices": self.get_type_choices("fuel"),
-                "default": vehicle.fuel_type_id if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "fuel_capacity",
-                "message": "Fuel Capacity (ltr)",
-                "default": str(vehicle.fuel_capacity) if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "oil_type",
-                "message": "Oil Type",
-                "default": vehicle.oil_type if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "oil_capacity",
-                "message": "Oil Capacity (ltr)",
-                "default": str(vehicle.oil_capacity) if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "tyre_size_front",
-                "message": "Tyre size front",
-                "default": vehicle.tyre_size_front if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "tyre_pressure_front",
-                "message": "Tyre pressure front",
-                "default": str(vehicle.tyre_pressure_front) if vehicle else "",
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "tyre_size_rear",
-                "message": "Tyre size rear",
-                "default": lambda x: vehicle.tyre_size_rear
+            inquirer.Text(
+                "reg_no",
+                message="Reg. No.",
+                default=vehicle.reg_no if vehicle else "",
+                # # validate=lambda val: len(val) != 0 or "Please supply a value",
+            ),
+            inquirer.Text(
+                "make",
+                message="Make",
+                default=vehicle.make if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "model",
+                message="Model",
+                default=vehicle.model if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "year",
+                message="Year",
+                default=str(vehicle.year) if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "purchase_date",
+                message="Purchase Date",
+                default=vehicle.purchase_date if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "purchase_price",
+                message="Purchase Price",
+                default=str(vehicle.purchase_price) if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "purchase_odometer",
+                message="Purchase Odometer",
+                default=str(vehicle.purchase_odometer) if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.List(
+                "fuel_type_id",
+                message="Fuel type",
+                choices=self.get_type_choices("fuel"),
+                default=str(vehicle.fuel_type_id) if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "fuel_capacity",
+                message="Fuel Capacity (ltr)",
+                default=str(vehicle.fuel_capacity) if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "oil_type",
+                message="Oil Type",
+                default=vehicle.oil_type if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "oil_capacity",
+                message="Oil Capacity (ltr)",
+                default=str(vehicle.oil_capacity) if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "tyre_size_front",
+                message="Tyre size front",
+                default=vehicle.tyre_size_front if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "tyre_pressure_front",
+                message="Tyre pressure front",
+                default=str(vehicle.tyre_pressure_front) if vehicle else "",
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "tyre_size_rear",
+                message="Tyre size rear",
+                default=vehicle.tyre_size_rear
                 if vehicle
-                else x.tyre_size_front,
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
-            {
-                "type": "input",
-                "name": "tyre_pressure_rear",
-                "message": "Tyre pressure rear",
-                "default": lambda x: str(vehicle.tyre_pressure_rear)
+                else self.get_default_tyre_size
+                # answers["tyre_size_front"]
+                # lambda x: vehicle.tyre_size_rear
+                # if vehicle
+                # else x.tyre_size_front,
+                # validate=self.check_length,
+            ),
+            inquirer.Text(
+                "tyre_pressure_rear",
+                message="Tyre pressure rear",
+                default=vehicle.tyre_pressure_rear
                 if vehicle
-                else x.tyre_pressure_front,
-                "validate": lambda val: len(val) != 0 or "Please supply a value",
-            },
+                else self.get_default_tyre_pressure
+                # validate=self.check_length,
+            ),
         ]
 
-        answers = prompt(questions)
+        answers = inquirer.prompt(questions)
 
         # process, then save
         answers["reg_no"] = answers["reg_no"].upper()
@@ -403,40 +388,74 @@ class Cli(BaseUI):
         answers["purchase_odometer"] = int(answers["purchase_odometer"])
         answers["fuel_capacity"] = float(answers["fuel_capacity"])
         answers["oil_capacity"] = float(answers["oil_capacity"])
-        answers["fuel_type_id`"] = int(answers["fuel_type_id"])
-        answers["tyre_pressure_front`"] = float(answers["tyre_pressure_front"])
-        answers["tyre_pressure_rear`"] = float(answers["tyre_pressure_rear"])
+        answers["fuel_type_id"] = int(answers["fuel_type_id"])
+        answers["tyre_pressure_front"] = float(answers["tyre_pressure_front"])
+        answers["tyre_pressure_rear"] = float(answers["tyre_pressure_rear"])
 
         if vehicle:
-            answers["id"] = vehicle.id
+            vehicle.reg_no = answers["reg_no"]
+            vehicle.make = answers["make"]
+            vehicle.model = answers["model"]
+            vehicle.year = answers["year"]
+            vehicle.purchase_price = answers["purchase_price"]
+            vehicle.purchase_date = answers["purchase_date"]
+            vehicle.purchase_odometer = answers["purchase_odometer"]
+            vehicle.fuel_type_id = answers["fuel_type_id"]
+            vehicle.fuel_capacity = answers["fuel_capacity"]
+            vehicle.oil_type = answers["oil_type"]
+            vehicle.oil_capacity = answers["oil_capacity"]
+            vehicle.tyre_size_front = answers["tyre_size_front"]
+            vehicle.tyre_size_rear = answers["tyre_size_rear"]
+            vehicle.tyre_pressure_front = answers["tyre_pressure_front"]
+            vehicle.tyre_pressure_rear = answers["tyre_pressure_rear"]
+        else:
+            # create new instance, add to collection
+            self.entity_manager.add(
+                VehicleEntity(
+                    -1,
+                    answers["reg_no"],
+                    answers["make"],
+                    answers["model"],
+                    answers["year"],
+                    answers["purchase_price"],
+                    answers["purchase_date"],
+                    answers["purchase_odometer"],
+                    answers["fuel_type_id"],
+                    answers["fuel_capacity"],
+                    answers["oil_type"],
+                    answers["oil_capacity"],
+                    answers["tyre_size_front"],
+                    answers["tyre_size_rear"],
+                    answers["tyre_pressure_front"],
+                    answers["tyre_pressure_rear"],
+                )
+            )
 
-        return self.entity_manager.vehicles.add(answers)
+        self.entity_manager.save()
 
     def show_main_menu(self):
         """
         Main menu
         """
         questions = [
-            {
-                "type": "list",
-                "name": "opts",
-                "message": "Things to do",
-                "choices": [
-                    {"name": "Vehicles", "key": "v", "value": "vehicles"},
-                    {"name": "Records", "key": "r", "value": "records"},
-                    Separator(),
-                    {"name": "Exit", "key": "x", "value": "exit"},
+            inquirer.List(
+                "opts",
+                message="Things to do",
+                choices=[
+                    ("Vehicles", "v"),
+                    ("Records", "r"),
+                    ("Exit", "x"),
                 ],
-            }
+            )
         ]
 
-        answers = prompt(questions)
+        answers = inquirer.prompt(questions)
 
-        if answers["opts"] == "exit":
+        if answers["opts"] == "x":
             self.is_running = False
-        elif answers["opts"] == "vehicles":
+        elif answers["opts"] == "v":
             self.vehicles_menu()
-        elif answers["opts"] == "records":
+        elif answers["opts"] == "r":
             self.records_menu()
 
     def main(self):
