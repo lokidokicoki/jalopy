@@ -75,15 +75,19 @@ class Cli(BaseUI):
         elif answers["opts"] == "e":
             print("\nEdit record")
             vehicle = self.select_vehicle()
-            record = self.select_record(vehicle)
-            self.record_form(record)
-            print("Record edited")
+            if vehicle:
+                record = self.select_record(vehicle)
+                if record:
+                    self.record_form(record)
+                    print("Record edited")
         elif answers["opts"] == "r":
             print("\nRemove record")
             vehicle = self.select_vehicle()
-            record = self.select_record(vehicle)
-            self.entity_manager.remove(record)
-            print("\nRecord removed")
+            if vehicle:
+                record = self.select_record(vehicle)
+                if record:
+                    self.entity_manager.remove(record)
+                    print("\nRecord removed")
         else:
             print("Return to main")
 
@@ -114,25 +118,28 @@ class Cli(BaseUI):
         elif answers["opts"] == "e":
             print("\nEdit vehicle")
             vehicle = self.select_vehicle()
-            self.vehicle_form(vehicle)
-            print("\nVehicle edited")
+            if vehicle:
+                self.vehicle_form(vehicle)
+                print("\nVehicle edited")
         elif answers["opts"] == "s":
             print("\nStats for vehicle")
-            vehicle = self.select_vehicle()
-            results = self.utils.stats(vehicle)
-            print("Record counts:")
-            for i in results["counts"]:
-                print("{}: {}".format(i["name"], i["count"]))
-            print("----")
-            print("Avg. MPG: {:0.2f}".format(results["avg_mpg"]))
-            print("Avg. km/l: {:0.2f}".format(results["avg_km_per_litre"]))
-            print("Avg. l/100Km: {:0.2f}".format(results["avg_l100"]))
-            print("Total cost: {:0.2f}".format(results["total_cost"]))
+            if vehicle:
+                vehicle = self.select_vehicle()
+                results = self.utils.stats(vehicle)
+                print("Record counts:")
+                for i in results["counts"]:
+                    print("{}: {}".format(i["name"], i["count"]))
+                print("----")
+                print("Avg. MPG: {:0.2f}".format(results["avg_mpg"]))
+                print("Avg. km/l: {:0.2f}".format(results["avg_km_per_litre"]))
+                print("Avg. l/100Km: {:0.2f}".format(results["avg_l100"]))
+                print("Total cost: {:0.2f}".format(results["total_cost"]))
         elif answers["opts"] == "r":
             print("\nRemove vehicle")
             vehicle = self.select_vehicle()
-            self.entity_manager.remove(vehicle)
-            print("\nVehicle removed")
+            if vehicle:
+                self.entity_manager.remove(vehicle)
+                print("\nVehicle removed")
         else:
             print("return to main")
 
@@ -142,15 +149,20 @@ class Cli(BaseUI):
         """
         all_vehicles = self.entity_manager.vehicles  # self.db_client.vehicles.get()
 
+        choices = [(i.reg_no, str(i.uid)) for i in all_vehicles]
+        choices.append(("Back", "b"))
         questions = [
             inquirer.List(
                 "opts",
                 message="Select vehicle",
-                choices=[(i.reg_no, str(i.uid)) for i in all_vehicles],
+                choices=choices,  # [(i.reg_no, str(i.uid)) for i in all_vehicles],
             )
         ]
 
         answers = inquirer.prompt(questions)
+
+        if answers["opts"] == "b":
+            return None
 
         return next(x for x in all_vehicles if x.uid == int(answers["opts"]))
 
@@ -168,15 +180,20 @@ class Cli(BaseUI):
         all_records = self.entity_manager.get_records_for_vehicle(vehicle.uid)
         # records.get(vehicle["id"])
 
+        choices = [(self.record_summary(i), str(i.uid)) for i in all_records]
+        choices.append(("Back", "b"))
         questions = [
             inquirer.List(
                 "opts",
                 message="Select record",
-                choices=[(self.record_summary(i), str(i.uid)) for i in all_records],
+                choices=choices,  # [(self.record_summary(i), str(i.uid)) for i in all_records],
             )
         ]
 
         answers = inquirer.prompt(questions)
+
+        if answers["opts"] == "b":
+            return None
 
         return next(x for x in all_records if x.uid == int(answers["opts"]))
 
