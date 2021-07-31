@@ -71,13 +71,19 @@ class Cli(BaseUI):
         if answers["opts"] == "a":
             print("\nAdd record")
             self.record_form()
+            print("\nRecord added")
         elif answers["opts"] == "e":
             print("\nEdit record")
             vehicle = self.select_vehicle()
             record = self.select_record(vehicle)
             self.record_form(record)
+            print("Record edited")
         elif answers["opts"] == "r":
-            print("TBD: remove vehicle")
+            print("\nRemove record")
+            vehicle = self.select_vehicle()
+            record = self.select_record(vehicle)
+            self.entity_manager.remove(record)
+            print("\nRecord removed")
         else:
             print("Return to main")
 
@@ -104,10 +110,12 @@ class Cli(BaseUI):
         if answers["opts"] == "a":
             print("\nAdd vehicle")
             self.vehicle_form()
+            print("\nVehicle added")
         elif answers["opts"] == "e":
             print("\nEdit vehicle")
             vehicle = self.select_vehicle()
             self.vehicle_form(vehicle)
+            print("\nVehicle edited")
         elif answers["opts"] == "s":
             print("\nStats for vehicle")
             vehicle = self.select_vehicle()
@@ -121,7 +129,10 @@ class Cli(BaseUI):
             print("Avg. l/100Km: {:0.2f}".format(results["avg_l100"]))
             print("Total cost: {:0.2f}".format(results["total_cost"]))
         elif answers["opts"] == "r":
-            print("TBD: remove vehicle")
+            print("\nRemove vehicle")
+            vehicle = self.select_vehicle()
+            self.entity_manager.remove(vehicle)
+            print("\nVehicle removed")
         else:
             print("return to main")
 
