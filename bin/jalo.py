@@ -2,10 +2,10 @@
 
 Will spin up the cli or gui based on passed args.
 """
-from shutil import copyfile
-from os.path import exists
-import configparser
 import argparse
+import configparser
+from os.path import exists
+from shutil import copyfile
 
 from jalopy.db.dbclient import DatabaseClient
 from jalopy.entities.entity_manager import EntityManager

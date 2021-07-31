@@ -2,7 +2,7 @@
 
 import datetime
 from dataclasses import asdict
-from typing import List, Union
+from typing import List, Union, Optional
 
 from jalopy.db.dbclient import DatabaseClient
 
@@ -26,7 +26,7 @@ class EntityManager:
 
     def get(
         self, entity_type: EntityType, uid: int
-    ) -> Union[VehicleEntity, RecordEntity]:
+    ) -> Union[VehicleEntity, RecordEntity, RecordType, FuelType]:
         """Get a specific entity from the collection
 
         :param: entity_type
