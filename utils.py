@@ -1,61 +1,66 @@
-from db import dbclient
+"""
+Collection of utility functions
+"""
+from entities.entity_manager import EntityManager
 
-litresPerGallon = 4.54609
-kmPerMile = 1.60934
-mpgToL100km = 235.215
-
-
-def calculateEconomy(record):
-    """
-    mpg
-    l/100km
-    km/l
-    """
-    tripKm = record["TRIP"] * kmPerMile
-
-    kpl = tripKm / record["ITEM_COUNT"]
-    mpg = record["TRIP"] / (record["ITEM_COUNT"] / litresPerGallon)
-    l100 = mpgToL100km / mpg
-
-    return {"mpg": mpg, "kpl": kpl, "l100": l100}
+LITRES_PER_GALLON = 4.54609
+KM_PER_MILE = 1.60934
+MPG_TO_L100_KM = 235.215
 
 
-def stats(vehicle):
-    """
-    Accumulative stats for this vehicle
-    """
+class Utils:
+    def __init__(self, entity_manager: EntityManager):
+        self.entity_manager = entity_manager
 
-    # get all records for this vehicle
-    records = dbclient.records.get(vehicle["ID"])
-    types = dbclient.getRecordTypes()
-    totalCost = 0
-    avgMpg = 0
-    avgKpl = 0
-    avgL100 = 0
-    counts = [{"id": x["ID"], "name": x["NAME"], "count": 0} for x in types]
+    @staticmethod
+    def calculate_economy(record):
+        """
+        mpg
+        l/100km
+        km/l
+        """
+        trip_km = record.trip * KM_PER_MILE
+        kpl = trip_km / record.item_count
+        mpg = record.trip / (record.item_count / LITRES_PER_GALLON)
+        l100 = MPG_TO_L100_KM / mpg
 
-    for record in records:
-        count = next(x for x in counts if x["id"] == record["RECORD_TYPE_ID"])
-        count["count"] = count["count"] + 1
-        if record["RECORD_TYPE_ID"] == 1:
-            eff = calculateEconomy(record)
+        return {"mpg": mpg, "kpl": kpl, "l100": l100}
 
-            avgMpg = avgMpg + eff["mpg"]
-            avgKpl = avgKpl + eff["kpl"]
-            avgL100 = avgL100 + eff["l100"]
+    def stats(self, vehicle):
+        """
+        Accumulative stats for this vehicle
+        """
+        # get all records for this vehicle
+        records = self.entity_manager.get_records_for_vehicle(vehicle.uid)
+        types = self.entity_manager.record_types
+        total_cost = 0
+        avg_mpg = 0
+        avg_km_per_litre = 0
+        avg_l100 = 0
+        counts = [{"id": x.uid, "name": x.name, "count": 0} for x in types]
 
-        totalCost = totalCost + record["COST"]
-    fuelCount = next(x for x in counts if x["id"] == 1)
+        for record in records:
+            count = next(x for x in counts if x["id"] == record.record_type_id)
+            count["count"] = count["count"] + 1
+            if record.record_type_id == 1:
+                eff = self.calculate_economy(record)
 
-    if fuelCount["count"] > 0:
-        avgMpg = avgMpg / fuelCount["count"]
-        avgKpl = avgKpl / fuelCount["count"]
-        avgL100 = avgL100 / fuelCount["count"]
+                avg_mpg = avg_mpg + eff["mpg"]
+                avg_km_per_litre = avg_km_per_litre + eff["kpl"]
+                avg_l100 = avg_l100 + eff["l100"]
 
-    return {
-        "counts": counts,
-        "avgMpg": avgMpg,
-        "avgKpl": avgKpl,
-        "avgL100": avgL100,
-        "totalCost": totalCost,
-    }
+            total_cost = total_cost + record.cost
+        fuel_count = next(x for x in counts if x["id"] == 1)
+
+        if fuel_count["count"] > 0:
+            avg_mpg = avg_mpg / fuel_count["count"]
+            avg_km_per_litre = avg_km_per_litre / fuel_count["count"]
+            avg_l100 = avg_l100 / fuel_count["count"]
+
+        return {
+            "counts": counts,
+            "avg_mpg": avg_mpg,
+            "avg_km_per_litre": avg_km_per_litre,
+            "avg_l100": avg_l100,
+            "total_cost": total_cost,
+        }

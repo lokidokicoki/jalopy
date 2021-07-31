@@ -1,26 +1,28 @@
+"""Main runner for the app.
+
+Will spin up the cli or gui based on passed args.
+"""
 from shutil import copyfile
 from os.path import exists
 import configparser
 import argparse
 
-from db import dbclient
-
-# import db.DBClient
-# from db import *
-import cli
-import app
-
-args = None
+from db.dbclient import DatabaseClient
+from entities.entity_manager import EntityManager
 
 
-def main():
+from ui import Cli, Gui
+import utils
+
+
+def main(args_):
     """
     Bootstrap the program
     """
     config = configparser.ConfigParser()
     config.read("config.ini")
 
-    if args.no_backup is False:
+    if args_.no_backup is False:
         if exists(config["db"]["path"]):
             print("Shared DB exists")
             copyfile(config["db"]["path"], "jalopy.db")
@@ -29,20 +31,29 @@ def main():
     else:
         print("Not using backup")
 
-    dbclient.init()
-    dbclient.createDatabase()
+    dbclient = DatabaseClient("jalopy.db")
+    # TODO: move to ctor
+    dbclient.create_database()
+
+    entity_manager = EntityManager(dbclient)
+
+    entity_manager.load()
 
     # if cli
-    if args.mode == "cli":
-        cli.main()
-    elif args.mode == "gui":
-        app.main()
+    user_interface = None
+    if args_.mode == "cli":
+        user_interface = Cli(entity_manager)
+    elif args_.mode == "gui":
+        user_interface = Gui(entity_manager)
     else:
-        print("Unknown mode, exiting")
+        print("Unknown mode, fallback to cli")
+        user_interface = Cli(entity_manager)
+
+    user_interface.main()
 
     dbclient.conn.close()
 
-    if args.no_backup is False:
+    if args_.no_backup is False:
         copyfile("jalopy.db", config["db"]["path"])
     print("Night night")
 
@@ -54,4 +65,4 @@ parser.add_argument("-n", "--no-backup", help="do not use backup", action="store
 args = parser.parse_args()
 
 
-main()
+main(args)
