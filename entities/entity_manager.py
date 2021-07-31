@@ -145,3 +145,13 @@ class EntityManager:
             if isinstance(record[key], datetime.date):
                 record[key] = datetime.date.isoformat(record[key])
         return record
+
+    def remove(self, entity):
+        if isinstance(entity, VehicleEntity):
+            self.dbclient.vehicle.delete(entity.uid)
+            self.vehicles.remove(entity)
+        elif isinstance(entity, RecordEntity):
+            self.dbclient.record.delete(entity.uid)
+            self.records.remove(entity)
+        else:
+            raise TypeError(f"add: unknown entity {entity}")
