@@ -16,3 +16,4 @@ class RecordEntity:
     cost: float
     item_count: float
     notes: str
+    archived: int = 0
