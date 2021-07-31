@@ -196,7 +196,7 @@ class Cli(BaseUI):
             inquirer.Text(
                 "record_date",
                 message="Date",
-                default=record.record_date.strftime("%Y/%m/%d") if record else "",
+                default=record.record_date.isoformat() if record else "",
                 # validate=self.check_length,
             ),
             inquirer.Text(
@@ -234,20 +234,17 @@ class Cli(BaseUI):
         # process, then saveo
         if record:
             record.record_type_id = int(answers["record_type_id"])
-            record.record_date = (
-                datetime.datetime.strptime(answers["record_date"], "%Y/%m/%d").date(),
-            )
+            record.record_date = datetime.date.fromisoformat(answers["record_date"])
             record.odometer = int(answers["odometer"])
             record.trip = float(answers["trip"])
             record.cost = float(answers["cost"])
             record.item_count = float(answers["item_count"])
-            print("todo: save updated record")
         else:
             record = RecordEntity(
                 -1,
                 int(answers["vehicle_id"]),
                 int(answers["record_type_id"]),
-                datetime.datetime.strptime(answers["record_date"], "%Y/%m/%d").date(),
+                datetime.date.fromisoformat(answers["record_date"]),
                 int(answers["odometer"]),
                 float(answers["trip"]),
                 float(answers["cost"]),
@@ -255,7 +252,8 @@ class Cli(BaseUI):
                 answers["notes"],
             )
             print("todo: add new record and save to db")
-            self.entity_manager.records.add(answers)
+            self.entity_manager.add(record)
+        self.entity_manager.save()
 
         # answers["vehicle_id"] = int(answers["vehicle_id"])
         # answers["record_type_id"] = int(answers["record_type_id"])
@@ -303,7 +301,7 @@ class Cli(BaseUI):
             inquirer.Text(
                 "purchase_date",
                 message="Purchase Date",
-                default=vehicle.purchase_date if vehicle else "",
+                default=vehicle.purchase_date.isoformat() if vehicle else "",
                 # validate=self.check_length,
             ),
             inquirer.Text(
@@ -384,6 +382,7 @@ class Cli(BaseUI):
         answers["make"] = answers["make"].lower().capitalize()
         answers["model"] = answers["model"].lower().capitalize()
         answers["year"] = int(answers["year"])
+        answers["purchase_date"] = datetime.date.fromisoformat(answers["purchase_date"])
         answers["purchase_price"] = float(answers["purchase_price"])
         answers["purchase_odometer"] = int(answers["purchase_odometer"])
         answers["fuel_capacity"] = float(answers["fuel_capacity"])
