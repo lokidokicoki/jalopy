@@ -2,22 +2,15 @@
 
 import datetime
 from dataclasses import asdict
-from enum import Enum
 from typing import List, Union
 
 from db.dbclient import DatabaseClient
 
+from .entity_type import EntityType
 from .fuel_type import FuelType
 from .record import RecordEntity
 from .record_type import RecordType
 from .vehicle import VehicleEntity
-
-
-class EntityType(Enum):
-    """EntityType enumerator"""
-
-    VEHICLE = 1
-    RECORD = 2
 
 
 class EntityManager:
@@ -32,33 +25,43 @@ class EntityManager:
         self.dbclient = dbclient
 
     def get(
-        self, entity_type: EntityType, entity_id: int
+        self, entity_type: EntityType, uid: int
     ) -> Union[VehicleEntity, RecordEntity]:
         """Get a specific entity from the collection
 
         :param: entity_type
-        :param: entity_id
+        :param: uid
         """
 
-        if entity_id is None:
-            raise TypeError(f"get missing entity_id for entity_type {type}")
+        if uid is None:
+            raise TypeError(f"get missing uid for entity_type {entity_type}")
 
         collection = None
         if entity_type == EntityType.VEHICLE:
             collection = self.vehicles
-        else:
+        elif entity_type == EntityType.RECORD:
             collection = self.records
+        elif entity_type == EntityType.RECORD_TYPE:
+            collection = self.record_types
+        elif entity_type == EntityType.FUEL_TYPE:
+            collection = self.fuel_types
+        else:
+            raise TypeError(f"Unknown entity type {entity_type}!")
 
-        return next((x for x in collection if x.entity_id == entity_id), None)
+        return next((x for x in collection if x.uid == uid), None)
 
     def get_records_for_vehicle(self, vehicle_id: int):
         """Get records for a specific vehicle"""
         if vehicle_id is None:
             raise TypeError("get_records_for_vehicle missing entity_id")
-        # print(self.records)
-        return [
+
+        records = [
             x for x in self.records if x.vehicle_id == vehicle_id and x.archived == 0
         ]
+
+        records.sort(key=lambda x: x.record_date)
+
+        return records
 
     def add(self, entity: Union[VehicleEntity, RecordEntity, RecordType, FuelType]):
         """Add an entity to the relevant collection
