@@ -8,7 +8,7 @@ import datetime
 import inquirer
 from inquirer import errors
 
-from jalopy.entities import EntityManager, EntityType, RecordEntity, VehicleEntity
+from jalopy.entities import EntityType, RecordEntity, VehicleEntity
 
 from .base_ui import BaseUI
 
@@ -20,19 +20,25 @@ class Cli(BaseUI):
 
     is_running = True
 
-    def __init__(self, entity_manager: EntityManager = None):
-        super().__init__(entity_manager)
-
     @staticmethod
     def get_default_tyre_size(answers):
+        """Get default tyre size, in this case, front
+
+        :param answers answers so far
+        """
         return answers["tyre_size_front"]
 
     @staticmethod
     def get_default_tyre_pressure(answers):
+        """Get default tyre pressure, in this case, front
+
+        :param answers answers so far
+        """
         return answers["tyre_pressure_front"]
 
     @staticmethod
     def check_length(answers, current):
+        """Validate, but it is broken"""
         print("check_len", answers, current)
         if len(current) == 0:
             raise errors.ValidationError("", reason="Please supply a value")
@@ -181,7 +187,6 @@ class Cli(BaseUI):
         Select a record for a specific vehicle
         """
         all_records = self.entity_manager.get_records_for_vehicle(vehicle.uid)
-        # records.get(vehicle["id"])
 
         choices = [(self.record_summary(i), str(i.uid)) for i in all_records]
         choices.append(("Back", "b"))
@@ -189,7 +194,7 @@ class Cli(BaseUI):
             inquirer.List(
                 "opts",
                 message="Select record",
-                choices=choices,  # [(self.record_summary(i), str(i.uid)) for i in all_records],
+                choices=choices,
             )
         ]
 
