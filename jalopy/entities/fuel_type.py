@@ -1,8 +1,10 @@
-"""Represents a type of record"""
+"""Represents a type of fuel"""
 from dataclasses import dataclass
 
 
 @dataclass
-class RecordType:
+class FuelType:
+    """FuelType"""
+
     uid: int
     name: str

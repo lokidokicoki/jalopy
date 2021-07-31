@@ -3,7 +3,7 @@ import gi
 gi.require_version("Gtk", "3.0")
 from gi.repository import Gtk
 
-from entities.entity_manager import EntityManager
+from jalopy.entities.entity_manager import EntityManager
 
 from .base_ui import BaseUI
 

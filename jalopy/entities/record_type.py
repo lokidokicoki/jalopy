@@ -3,6 +3,8 @@ from dataclasses import dataclass
 
 
 @dataclass
-class FuelType:
+class RecordType:
+    """RecordType"""
+
     uid: int
     name: str

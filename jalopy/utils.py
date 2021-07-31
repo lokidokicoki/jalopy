@@ -1,7 +1,7 @@
 """
 Collection of utility functions
 """
-from entities.entity_manager import EntityManager
+from jalopy.entities.entity_manager import EntityManager
 
 LITRES_PER_GALLON = 4.54609
 KM_PER_MILE = 1.60934

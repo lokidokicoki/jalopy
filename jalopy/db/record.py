@@ -1,6 +1,6 @@
-"""DB Record getter/setter"""
+"""DB Record"""
 
-from db.base_item import BaseItem
+from jalopy.db.base_item import BaseItem
 
 
 class Record(BaseItem):
@@ -9,4 +9,5 @@ class Record(BaseItem):
     """
 
     def __init__(self, conn, cursor):
+        """Create instance of Record"""
         super().__init__(conn, cursor, "record")

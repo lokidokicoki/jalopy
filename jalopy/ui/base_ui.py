@@ -1,5 +1,6 @@
-from entities.entity_manager import EntityManager
-from utils import Utils
+"""Base User Interface"""
+from jalopy.entities.entity_manager import EntityManager
+from jalopy.utils import Utils
 
 
 class BaseUI:

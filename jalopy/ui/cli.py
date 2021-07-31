@@ -8,7 +8,7 @@ import datetime
 import inquirer
 from inquirer import errors
 
-from entities import EntityManager, EntityType, RecordEntity, VehicleEntity
+from jalopy.entities import EntityManager, EntityType, RecordEntity, VehicleEntity
 
 from .base_ui import BaseUI
 

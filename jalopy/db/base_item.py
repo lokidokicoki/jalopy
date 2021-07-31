@@ -5,13 +5,24 @@ from typing import Optional
 
 
 class BaseItem:
+    """BaseItem"""
+
     def __init__(self, conn, cursor, table_name: Optional[str] = None):
+        """Create an instance of a BaseItem
+
+        :param conn database connection
+        :param cursor database cursor
+        :param table_name table the item represents
+        """
         self.conn = conn
         self.cursor = cursor
         self.table_name = table_name
 
     def create(self, data):
-        print(f"create {self.table_name} record")
+        """Create a new row in the database
+
+        :param data
+        """
         fields = []
         values = []
         for key in data.keys():
@@ -24,38 +35,40 @@ class BaseItem:
         ) VALUES (
             {','.join(values)}
         )"""
-        print(sql)
         self.cursor.execute(sql, data)
         self.conn.commit()
 
     def read(self, where: Optional[str] = None):
-        print(f"read {self.table_name}")
+        """Read from the table
+
+        :param where optional where clause
+        """
         sql = f"SELECT * FROM {self.table_name} WHERE archived = 0"
         if where:
             sql += f" AND {where}"
 
-        print(sql)
         self.cursor.execute(sql)
         return self.cursor.fetchall()
 
     def update(self, data):
+        """Update record in table
+
+        :param data details to update
         """
-        Add/amend record
-        """
-        print(f"update {self.table_name} record")
         fields = []
         for key in data.keys():
             if key != "uid":
                 fields.append(f"{key}=:{key}")
 
         sql = f"UPDATE {self.table_name} SET {','.join(fields)} WHERE uid=:uid"
-        print(sql)
-        print(data)
         self.cursor.execute(sql, data)
         self.conn.commit()
 
     def delete(self, uid: int):
+        """Delete/archive row in table
+
+        :param uid identifer or row
+        """
         sql = f"UPDATE {self.table_name} SET archived=1 WHERE uid={uid}"
-        print(sql)
         self.cursor.execute(sql)
         self.conn.commit()

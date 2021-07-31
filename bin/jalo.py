@@ -7,12 +7,9 @@ from os.path import exists
 import configparser
 import argparse
 
-from db.dbclient import DatabaseClient
-from entities.entity_manager import EntityManager
-
-
-from ui import Cli, Gui
-import utils
+from jalopy.db.dbclient import DatabaseClient
+from jalopy.entities.entity_manager import EntityManager
+from jalopy.ui import Cli, Gui
 
 
 def main(args_):

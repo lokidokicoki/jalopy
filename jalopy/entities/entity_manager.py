@@ -4,7 +4,7 @@ import datetime
 from dataclasses import asdict
 from typing import List, Union
 
-from db.dbclient import DatabaseClient
+from jalopy.db.dbclient import DatabaseClient
 
 from .entity_type import EntityType
 from .fuel_type import FuelType

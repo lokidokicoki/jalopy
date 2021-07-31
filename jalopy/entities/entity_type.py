@@ -1,3 +1,4 @@
+"""Entity Type enumeration"""
 from enum import Enum
 
 

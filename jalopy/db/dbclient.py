@@ -12,6 +12,10 @@ class DatabaseClient:
     """
 
     def __init__(self, db_name):
+        """Create instance od DatabaseClient
+
+        :param db_name name of database to access
+        """
         self.conn = sqlite3.connect(
             db_name, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES
         )
@@ -31,7 +35,6 @@ class DatabaseClient:
         result = self.cursor.fetchone()
 
         if result is None:
-            print("create jalopy.db tables")
             self.cursor.executescript(
                 """
                 CREATE TABLE IF NOT EXISTS vehicle(
