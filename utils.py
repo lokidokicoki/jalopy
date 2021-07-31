@@ -1,7 +1,7 @@
 """
 Collection of utility functions
 """
-from entities.entity_manager import EntityManager, EntityType
+from entities.entity_manager import EntityManager
 
 LITRES_PER_GALLON = 4.54609
 KM_PER_MILE = 1.60934
@@ -31,16 +31,15 @@ class Utils:
         Accumulative stats for this vehicle
         """
         # get all records for this vehicle
-        records = self.entity_manager.get_records_for_vehicle(vehicle.entity_id)
+        records = self.entity_manager.get_records_for_vehicle(vehicle.uid)
         types = self.entity_manager.record_types
         total_cost = 0
         avg_mpg = 0
         avg_km_per_litre = 0
         avg_l100 = 0
-        counts = [{"id": x.entity_id, "name": x.name, "count": 0} for x in types]
+        counts = [{"id": x.uid, "name": x.name, "count": 0} for x in types]
 
         for record in records:
-            print(record)
             count = next(x for x in counts if x["id"] == record.record_type_id)
             count["count"] = count["count"] + 1
             if record.record_type_id == 1:
