@@ -4,5 +4,5 @@ from dataclasses import dataclass
 
 @dataclass
 class FuelType:
-    entity_id: int
+    uid: int
     name: str

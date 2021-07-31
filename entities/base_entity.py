@@ -6,4 +6,4 @@ from dataclasses import dataclass
 class BaseEntity:
     """Base entity"""
 
-    entity_id: int
+    uid: int

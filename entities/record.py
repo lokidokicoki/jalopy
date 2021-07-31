@@ -7,7 +7,7 @@ from datetime import date
 class RecordEntity:
     """RecordEntity"""
 
-    entity_id: int
+    uid: int
     vehicle_id: int
     record_type_id: int
     record_date: date

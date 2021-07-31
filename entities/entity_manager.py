@@ -77,45 +77,48 @@ class EntityManager:
         """Load all data from dbclient into entities"""
         print("load all data")
 
-        for x in self.dbclient.get_record_types():
-            self.add(RecordType(x["id"], x["name"]))
+        for row in self.dbclient.get_record_types():
+            self.add(RecordType(row["uid"], row["name"]))
 
-        for x in self.dbclient.get_fuel_types():
-            self.add(FuelType(x["id"], x["name"]))
+        for row in self.dbclient.get_fuel_types():
+            self.add(FuelType(row["uid"], row["name"]))
 
-        for x in self.dbclient.vehicle.get():
+        for row in self.dbclient.vehicle.get():
             self.add(
                 VehicleEntity(
-                    x["id"],
-                    x["reg_no"],
-                    x["make"],
-                    x["model"],
-                    x["year"],
-                    x["purchase_price"],
-                    x["purchase_date"],
-                    x["purchase_odometer"],
-                    x["fuel_type_id"],
-                    x["fuel_capacity"],
-                    x["oil_type"],
-                    x["oil_capacity"],
-                    x["tyre_size_front"],
-                    x["tyre_size_rear"],
-                    x["tyre_pressure_front"],
-                    x["tyre_pressure_rear"],
+                    row["uid"],
+                    row["reg_no"],
+                    row["make"],
+                    row["model"],
+                    row["year"],
+                    row["purchase_price"],
+                    row["purchase_date"],
+                    row["purchase_odometer"],
+                    row["fuel_type_id"],
+                    row["fuel_capacity"],
+                    row["oil_type"],
+                    row["oil_capacity"],
+                    row["tyre_size_front"],
+                    row["tyre_size_rear"],
+                    row["tyre_pressure_front"],
+                    row["tyre_pressure_rear"],
                 )
             )
 
-        for x in self.dbclient.record.get():
+        for row in self.dbclient.record.get():
             self.add(
                 RecordEntity(
-                    x["id"],
-                    x["vehicle_id"],
-                    x["record_type_id"],
-                    datetime.datetime.strptime(x["record_date"], "%Y/%m/%d").date(),
-                    int(x["odometer"]),
-                    float(x["trip"]),
-                    float(x["cost"]),
-                    float(x["item_count"]),
-                    x["notes"],
+                    row["uid"],
+                    row["vehicle_id"],
+                    row["record_type_id"],
+                    datetime.datetime.strptime(row["record_date"], "%Y/%m/%d").date(),
+                    int(row["odometer"]),
+                    float(row["trip"]),
+                    float(row["cost"]),
+                    float(row["item_count"]),
+                    row["notes"],
                 )
             )
+
+    def save(self):
+        print("EM.save...")

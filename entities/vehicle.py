@@ -7,7 +7,7 @@ from datetime import date
 class VehicleEntity:
     """VehicleEntity"""
 
-    entity_id: int
+    uid: int
     reg_no: str
     make: str
     model: str
