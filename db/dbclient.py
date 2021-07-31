@@ -35,7 +35,7 @@ class DatabaseClient:
             self.cursor.executescript(
                 """
                 CREATE TABLE vehicle(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    uid INTEGER PRIMARY KEY AUTOINCREMENT,
                     reg_no CHAR(10) NOT NULL,
                     make TEXT NOT NULL,
                     model TEXT NOT NULL,
@@ -54,7 +54,7 @@ class DatabaseClient:
                 );
 
                 CREATE TABLE fuel_type(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    uid INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL
                 );
 
@@ -64,7 +64,7 @@ class DatabaseClient:
                 INSERT INTO fuel_type(name) VALUES('Super Diesel');
 
                 CREATE TABLE records(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    uid INTEGER PRIMARY KEY AUTOINCREMENT,
                     vehicle_id INTEGER NOT NULL,
                     record_type_id INTEGER NOT NULL,
                     record_date TEXT NOT NULL,
@@ -76,7 +76,7 @@ class DatabaseClient:
                 );
 
                 CREATE TABLE record_type(
-                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    uid INTEGER PRIMARY KEY AUTOINCREMENT,
                     name TEXT NOT NULL
                 );
                 INSERT INTO record_type(name) VALUES('Fuel');
@@ -95,12 +95,12 @@ class DatabaseClient:
         """
         Get all record types
         """
-        self.cursor.execute("SELECT id,name FROM record_type")
+        self.cursor.execute("SELECT uid,name FROM record_type")
         return self.cursor.fetchall()
 
     def get_fuel_types(self):
         """
         Get fuel types
         """
-        self.cursor.execute("SELECT id,name FROM fuel_type")
+        self.cursor.execute("SELECT uid,name FROM fuel_type")
         return self.cursor.fetchall()

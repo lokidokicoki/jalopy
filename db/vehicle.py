@@ -7,7 +7,7 @@ class Vehicle(BaseItem):
         self.cursor.execute(
             """
             SELECT
-            ID,
+            uid,
             reg_no,
             make,
             model,
@@ -33,7 +33,7 @@ class Vehicle(BaseItem):
         """
         Add/amend vehicle record
         """
-        if "id" in vehicle:
+        if "uid" in vehicle:
             sql = """
             UPDATE vehicle SET
             reg_no=:reg_no,
@@ -51,7 +51,7 @@ class Vehicle(BaseItem):
             tyre_size_rear=:tyre_size_rear,
             tyre_pressure_front=:tyre_pressure_front,
             tyre_pressure_rear=:tyre_pressure_rear
-            WHERE id=:id
+            WHERE uid=:uid
             """
 
         else:

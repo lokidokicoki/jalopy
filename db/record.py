@@ -26,7 +26,7 @@ class Record(BaseItem):
         """
         Add/amend record
         """
-        if "id" in record:
+        if "uid" in record:
             sql = """
                 UPDATE record SET
                 vehicle_id=:vehicle_id,
@@ -37,7 +37,7 @@ class Record(BaseItem):
                 cost=:cost,
                 item_count=:item_count,
                 notes=:notes
-            WHERE id=:id
+            WHERE uid=:uid
             """
         else:
             sql = """INSERT INTO record (
