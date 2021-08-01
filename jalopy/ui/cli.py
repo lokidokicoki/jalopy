@@ -4,9 +4,7 @@ Command line interface
 
 import datetime
 
-# from PyInquirer import Separator, prompt
 import inquirer
-from inquirer import errors
 
 from jalopy.entities import EntityType, RecordEntity, VehicleEntity
 
@@ -37,11 +35,27 @@ class Cli(BaseUI):
         return answers["tyre_pressure_front"]
 
     @staticmethod
-    def check_length(answers, current):
-        """Validate, but it is broken"""
-        print("check_len", answers, current)
+    def check_length(_, current):
+        """Check length of answer"""
         if len(current) == 0:
-            raise errors.ValidationError("", reason="Please supply a value")
+            print("No value given")
+            raise inquirer.errors.ValidationError("", reason="Please supply a value")
+
+        return True
+
+    @staticmethod
+    def check_date(_, current):
+        """Check current answer matches required date format"""
+        if len(current) == 0:
+            print("No value given")
+        else:
+            try:
+                datetime.date.fromisoformat(current)
+            except ValueError as err:
+                print(err)
+                return False
+
+        return True
 
     def get_type_choices(self, required_type):
         """
@@ -231,9 +245,9 @@ class Cli(BaseUI):
             ),
             inquirer.Text(
                 "record_date",
-                message="Date",
+                message="Date (YYYY-MM-DD)",
                 default=record.record_date.isoformat() if record else "",
-                # validate=self.check_length,
+                validate=self.check_date,
             ),
             inquirer.Text(
                 "odometer",
@@ -250,7 +264,7 @@ class Cli(BaseUI):
                 "cost",
                 message="Cost",
                 default=str(record.cost) if record else "",
-                # validate=self.check_length,
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "item_count",
@@ -287,16 +301,9 @@ class Cli(BaseUI):
                 float(answers["item_count"]),
                 answers["notes"],
             )
-            print("todo: add new record and save to db")
             self.entity_manager.add(record)
-        self.entity_manager.save()
 
-        # answers["vehicle_id"] = int(answers["vehicle_id"])
-        # answers["record_type_id"] = int(answers["record_type_id"])
-        # answers["odometer"] = int(answers["odometer"])
-        # answers["trip"] = float(answers["trip"])
-        # answers["cost"] = float(answers["cost"])
-        # answers["item_count"] = float(answers["item_count"])
+        self.entity_manager.save()
 
         # if it is a fuel record, calculate & display the fuel economy
         if int(answers["record_type_id"]) == 1:
@@ -314,100 +321,95 @@ class Cli(BaseUI):
                 "reg_no",
                 message="Reg. No.",
                 default=vehicle.reg_no if vehicle else "",
-                # # validate=lambda val: len(val) != 0 or "Please supply a value",
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "make",
                 message="Make",
                 default=vehicle.make if vehicle else "",
-                # validate=self.check_length,
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "model",
                 message="Model",
                 default=vehicle.model if vehicle else "",
-                # validate=self.check_length,
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "year",
                 message="Year",
                 default=str(vehicle.year) if vehicle else "",
-                # validate=self.check_length,
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "purchase_date",
-                message="Purchase Date",
+                message="Purchase Date (YYYY-MM-DD)",
                 default=vehicle.purchase_date.isoformat() if vehicle else "",
-                # validate=self.check_length,
+                validate=self.check_date,
             ),
             inquirer.Text(
                 "purchase_price",
                 message="Purchase Price",
                 default=str(vehicle.purchase_price) if vehicle else "",
-                # validate=self.check_length,
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "purchase_odometer",
                 message="Purchase Odometer",
                 default=str(vehicle.purchase_odometer) if vehicle else "",
-                # validate=self.check_length,
+                validate=self.check_length,
             ),
             inquirer.List(
                 "fuel_type_id",
                 message="Fuel type",
                 choices=self.get_type_choices("fuel"),
                 default=str(vehicle.fuel_type_id) if vehicle else "",
-                # validate=self.check_length,
             ),
             inquirer.Text(
                 "fuel_capacity",
                 message="Fuel Capacity (ltr)",
-                default=str(vehicle.fuel_capacity) if vehicle else "",
-                # validate=self.check_length,
+                default=str(vehicle.fuel_capacity) if vehicle else "0",
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "oil_type",
                 message="Oil Type",
                 default=vehicle.oil_type if vehicle else "",
-                # validate=self.check_length,
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "oil_capacity",
                 message="Oil Capacity (ltr)",
-                default=str(vehicle.oil_capacity) if vehicle else "",
-                # validate=self.check_length,
+                default=str(vehicle.oil_capacity) if vehicle else "0",
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "tyre_size_front",
                 message="Tyre size front",
                 default=vehicle.tyre_size_front if vehicle else "",
-                # validate=self.check_length,
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "tyre_pressure_front",
                 message="Tyre pressure front",
-                default=str(vehicle.tyre_pressure_front) if vehicle else "",
-                # validate=self.check_length,
+                default=str(vehicle.tyre_pressure_front) if vehicle else "0",
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "tyre_size_rear",
                 message="Tyre size rear",
                 default=vehicle.tyre_size_rear
                 if vehicle
-                else self.get_default_tyre_size
-                # answers["tyre_size_front"]
-                # lambda x: vehicle.tyre_size_rear
-                # if vehicle
-                # else x.tyre_size_front,
-                # validate=self.check_length,
+                else self.get_default_tyre_size,
+                validate=self.check_length,
             ),
             inquirer.Text(
                 "tyre_pressure_rear",
                 message="Tyre pressure rear",
                 default=vehicle.tyre_pressure_rear
                 if vehicle
-                else self.get_default_tyre_pressure
-                # validate=self.check_length,
+                else self.get_default_tyre_pressure,
+                validate=self.check_length,
             ),
         ]
 
