@@ -79,6 +79,7 @@ class Cli(BaseUI):
                 "opts",
                 message="Records menu",
                 choices=[
+                    ("List", "l"),
                     ("Add", "a"),
                     ("Edit", "e"),
                     ("Remove", "r"),
@@ -93,6 +94,11 @@ class Cli(BaseUI):
             print("\nAdd record")
             self.record_form()
             print("\nRecord added")
+        elif answers["opts"] == "l":
+            print("\nList records")
+            vehicle = self.select_vehicle()
+            if vehicle:
+                self.select_record(vehicle)
         elif answers["opts"] == "e":
             print("\nEdit record")
             vehicle = self.select_vehicle()
@@ -194,7 +200,7 @@ class Cli(BaseUI):
         record_type = self.entity_manager.get(
             EntityType.RECORD_TYPE, record.record_type_id
         )
-        return f"{record.record_date} | {record_type.name} | {record.notes}"
+        return f"{record.record_date} | {record.odometer} | {record_type.name} | £{record.cost} | {record.notes}"
 
     def select_record(self, vehicle):
         """
