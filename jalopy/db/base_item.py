@@ -21,7 +21,8 @@ class BaseItem:
 	def create(self, data):
 		"""Create a new row in the database
 
-		:param data
+		:param data: row data
+		:return: newly inserted row
 		"""
 		fields = []
 		values = []
@@ -34,9 +35,11 @@ class BaseItem:
 			{','.join(fields)}
 		) VALUES (
 			{','.join(values)}
-		)"""
+		) RETURNING *;"""
 		self.cursor.execute(sql, data)
+		new_record = self.cursor.fetchone()
 		self.conn.commit()
+		return new_record
 
 	def read(self, where: Optional[str] = None):
 		"""Read from the table
