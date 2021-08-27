@@ -4,3 +4,4 @@ jalopy.db
 __pycache__
 config.ini
 .python-version
+test.db
