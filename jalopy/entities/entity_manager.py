@@ -131,13 +131,15 @@ class EntityManager:
 	def save(self):
 		for entity in self.vehicles:
 			if entity.uid == -1:
-				self.dbclient.vehicle.create(self.as_record(entity))
+				retval = self.dbclient.vehicle.create(self.as_record(entity))
+				entity.uid = retval["uid"]
 			else:
 				self.dbclient.vehicle.update(self.as_record(entity))
 
 		for entity in self.records:
 			if entity.uid == -1:
-				self.dbclient.record.create(self.as_record(entity))
+				retval = self.dbclient.record.create(self.as_record(entity))
+				entity.uid = retval["uid"]
 			else:
 				self.dbclient.record.update(self.as_record(entity))
 
