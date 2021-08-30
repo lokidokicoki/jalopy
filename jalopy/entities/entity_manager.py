@@ -160,3 +160,12 @@ class EntityManager:
 			self.records.remove(entity)
 		else:
 			raise TypeError(f"add: unknown entity {entity}")
+
+	def get_records_by_type(self, type_ :int):
+		records = [
+			x for x in self.records if x.record_type_id == type_ and x.archived == 0
+		]
+
+		records.sort(key=lambda x: x.record_date)
+
+		return records
