@@ -161,10 +161,17 @@ class EntityManager:
 		else:
 			raise TypeError(f"add: unknown entity {entity}")
 
-	def get_records_by_type(self, type_ :int):
-		records = [
-			x for x in self.records if x.record_type_id == type_ and x.archived == 0
-		]
+	def filter_records_by_type(self, type_ :int, records:
+							Optional[List[RecordEntity]] = None):
+		if records:
+			records = [
+				x for x in records if x.record_type_id == type_ and x.archived == 0
+			]
+		else:
+			records = [
+				x for x in self.records if x.record_type_id == type_ and x.archived == 0
+			]
+
 
 		records.sort(key=lambda x: x.record_date)
 

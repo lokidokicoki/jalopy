@@ -91,11 +91,15 @@ class Cli(BaseUI):
 		if answers["opts"] == "1":
 			print("\nHistoric prices")
 			# 1 = fuel
-			plots.historic_prices(self.entity_manager.get_records_by_type(1))
+			plots.historic_prices(self.entity_manager.filter_records_by_type(1))
 		elif answers["opts"] == "2":
 			vehicle = self.select_vehicle()
 			if vehicle:
 				print("Avg. mpg")
+				all_records = self.entity_manager.get_records_for_vehicle(vehicle.uid)
+				plots.fuel_economy(vehicle, self.entity_manager.filter_records_by_type(1,
+																 all_records))
+
 		else:
 			print("Return to main")
 
