@@ -9,6 +9,9 @@ MPG_TO_L100_KM = 235.215
 
 
 class Utils:
+	"""
+	Utility methods
+	"""
 	def __init__(self, entity_manager: EntityManager):
 		self.entity_manager = entity_manager
 

@@ -1,49 +1,63 @@
+"""
+Plot module.
+"""
 from typing import List
-import matplotlib.pyplot as plt
+
 import matplotlib.dates as mdates
+import matplotlib.pyplot as plot
+
 from jalopy.entities import RecordEntity, VehicleEntity
 from jalopy.utils import Utils
 
 
 def historic_prices(records: List[RecordEntity]):
-	fig, ax = plt.subplots()
+	"""
+	Plot historic fuel prices over time
+
+	:param records: all current records
+	"""
+	fig, axes = plot.subplots()
 
 	x = [x.record_date for x in records]
 	y = [x.cost / x.item_count for x in records]
 
-	ax.plot(x, y, 'o', ls='-')
-	ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-	ax.xaxis.set_minor_locator(mdates.MonthLocator())
-	ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-	#ax.set_xlim(records[0].record_date, records[len(records) - 1].record_date)
+	axes.plot(x, y, 'o', ls='-')
+	axes.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+	axes.xaxis.set_minor_locator(mdates.MonthLocator())
+	axes.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 
-	ax.format_xdata = mdates.DateFormatter('%Y-%m-%d')
-	ax.format_ydata = lambda x : f'£{x:.3f}'
-	ax.grid(True)
+	axes.format_xdata = mdates.DateFormatter('%Y-%m-%d')
+	axes.format_ydata = lambda x: f'£{x:.3f}'
+	axes.grid(True)
 
-	ax.set_title(f'Historic Fuel Price')
-	ax.set_ylabel('Price per litre')
+	axes.set_title('Historic Fuel Price')
+	axes.set_ylabel('Price per litre')
 	fig.autofmt_xdate()
-	plt.show()
+	plot.show()
 
-def fuel_economy(vehicle:VehicleEntity, records: List[RecordEntity]):
-	print('plot fuel economy')
-	fig, ax = plt.subplots()
+
+def fuel_economy(vehicle: VehicleEntity, records: List[RecordEntity]):
+	"""
+	Plot vehicle economy over time
+
+	:param vehicle: selected vehicle
+	:param records: vehicles records
+	"""
+	fig, axes = plot.subplots()
 
 	x = [x.record_date for x in records]
 	y = [Utils.calculate_economy(x)['mpg'] for x in records]
 
-	ax.plot(x, y, 'o', ls='-')
-	ax.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
-	ax.xaxis.set_minor_locator(mdates.MonthLocator())
-	ax.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
-	#ax.set_xlim(records[0].record_date, records[len(records) - 1].record_date)
+	axes.plot(x, y, 'o', ls='-')
+	axes.xaxis.set_major_locator(mdates.MonthLocator(interval=3))
+	axes.xaxis.set_minor_locator(mdates.MonthLocator())
+	axes.xaxis.set_major_formatter(mdates.DateFormatter('%Y-%m-%d'))
 
-	ax.format_xdata = mdates.DateFormatter('%Y-%m-%d')
-	ax.format_ydata = lambda x : f'{x:.2f}'
-	ax.grid(True)
+	axes.format_xdata = mdates.DateFormatter('%Y-%m-%d')
+	axes.format_ydata = lambda x: f'{x:.2f}'
+	axes.grid(True)
 
-	ax.set_title(f'Fuel Economy {vehicle.reg_no}')
-	ax.set_ylabel('MPG')
+	axes.set_title(f'Fuel Economy {vehicle.reg_no}')
+	axes.set_ylabel('MPG')
 	fig.autofmt_xdate()
-	plt.show()
+	plot.show()
