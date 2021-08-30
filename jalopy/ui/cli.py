@@ -9,7 +9,7 @@ import inquirer
 from jalopy.entities import EntityType, RecordEntity, VehicleEntity
 
 from jalopy.ui.base_ui import BaseUI
-
+import jalopy.plots as plots
 
 class Cli(BaseUI):
 	"""
@@ -90,6 +90,8 @@ class Cli(BaseUI):
 
 		if answers["opts"] == "1":
 			print("\nHistoric prices")
+			# 1 = fuel
+			plots.historic_prices(self.entity_manager.get_records_by_type(1))
 		elif answers["opts"] == "2":
 			vehicle = self.select_vehicle()
 			if vehicle:
