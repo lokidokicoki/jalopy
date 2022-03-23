@@ -3,8 +3,11 @@ Plot module.
 """
 from typing import List
 
+import matplotlib
+matplotlib.use('TkAgg')
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plot
+
 
 from jalopy.entities import RecordEntity, VehicleEntity
 from jalopy.utils import Utils
