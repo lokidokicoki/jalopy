@@ -1,3 +1,2 @@
 from .cli import Cli
-
-# from .gui import Gui
+from .gui import Gui
