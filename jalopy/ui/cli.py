@@ -4,12 +4,11 @@ Command line interface
 
 import datetime
 
-import inquirer
-
+import inquirer  # type: ignore
+from jalopy import plots
 from jalopy.entities import EntityType, RecordEntity, VehicleEntity
-
 from jalopy.ui.base_ui import BaseUI
-import jalopy.plots as plots
+
 
 class Cli(BaseUI):
 	"""
@@ -97,8 +96,7 @@ class Cli(BaseUI):
 			if vehicle:
 				print("Avg. mpg")
 				all_records = self.entity_manager.get_records_for_vehicle(vehicle.uid)
-				plots.fuel_economy(vehicle, self.entity_manager.filter_records_by_type(1,
-																 all_records))
+				plots.fuel_economy(vehicle, self.entity_manager.filter_records_by_type(1, all_records))
 
 		else:
 			print("Return to main")
