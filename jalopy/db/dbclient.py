@@ -110,3 +110,9 @@ class DatabaseClient:
 		"""
 		self.cursor.execute("SELECT uid,name FROM fuel_type")
 		return self.cursor.fetchall()
+
+	def commit(self):
+		"""
+		Commit changes to DB
+		"""
+		self.conn.commit()
