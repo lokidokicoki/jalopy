@@ -20,3 +20,5 @@ On chromeos install https://linuxhint.com/google_drive_installation_ubuntu/ ocam
 [db]
 path=/mnt/chromeos/GoogleDrive/MyDrive/jalopy.db
 ```
+
+Run it like this: `source bin/run_jalo.py`

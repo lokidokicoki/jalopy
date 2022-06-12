@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "jalo.py"
+version = "1.0.0"
+description = "Fuel economay"
+authors = ["Robin Tregaskis <lokidokicoki@gmail.com>"]
+
+[tool.poetry.dependencies]
+python = "^3.9"
+matplot = "^0.1.9"
+PyGObject = "^3.42.0"
+
+[tool.poetry.dev-dependencies]
+isort = "^5.10.1"
+mypy = "^0.942"
+black-with-tabs = "^19.10b3"
+pylint = "^2.13.1"
+flake8 = "^4.0.1"
+pre-commit = "^2.17.0"
+commitizen = "^2.21.2"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

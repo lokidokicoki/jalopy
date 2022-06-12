@@ -9,7 +9,7 @@ from shutil import copyfile
 
 from jalopy.db.dbclient import DatabaseClient
 from jalopy.entities.entity_manager import EntityManager
-from jalopy.ui import Cli  # , Gui
+from jalopy.ui import Cli , Gui
 
 
 def main(args_):

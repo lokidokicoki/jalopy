@@ -2,7 +2,7 @@
 
 import datetime
 from dataclasses import asdict
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 from jalopy.db.dbclient import DatabaseClient
 
@@ -142,6 +142,8 @@ class EntityManager:
 				entity.uid = retval["uid"]
 			else:
 				self.dbclient.record.update(self.as_record(entity))
+
+		self.dbclient.commit()
 
 	@staticmethod
 	def as_record(entity):

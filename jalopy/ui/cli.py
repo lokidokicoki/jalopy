@@ -4,12 +4,11 @@ Command line interface
 
 import datetime
 
-import inquirer
-
+import inquirer  # type: ignore
+from jalopy import plots
 from jalopy.entities import EntityType, RecordEntity, VehicleEntity
-
 from jalopy.ui.base_ui import BaseUI
-import jalopy.plots as plots
+
 
 class Cli(BaseUI):
 	"""
@@ -97,8 +96,10 @@ class Cli(BaseUI):
 			if vehicle:
 				print("Avg. mpg")
 				all_records = self.entity_manager.get_records_for_vehicle(vehicle.uid)
-				plots.fuel_economy(vehicle, self.entity_manager.filter_records_by_type(1,
-																 all_records))
+				plots.fuel_economy(
+					vehicle,
+					self.entity_manager.filter_records_by_type(1, all_records)
+				)
 
 		else:
 			print("Return to main")
@@ -188,12 +189,12 @@ class Cli(BaseUI):
 				results = self.utils.stats(vehicle)
 				print("Record counts:")
 				for i in results["counts"]:
-					print("{}: {}".format(i["name"], i["count"]))
+					print(f"{i['name']}: {i['count']}")
 				print("----")
-				print("Avg. MPG: {:0.2f}".format(results["avg_mpg"]))
-				print("Avg. km/l: {:0.2f}".format(results["avg_km_per_litre"]))
-				print("Avg. l/100Km: {:0.2f}".format(results["avg_l100"]))
-				print("Total cost: {:0.2f}".format(results["total_cost"]))
+				print(f"Avg. MPG: {results['avg_mpg']:0.2f}")
+				print(f"Avg. km/l: {results['avg_km_per_litre']:0.2f}")
+				print(f"Avg. l/100Km: {results['avg_l100']:0.2f}")
+				print(f"Total cost: {results['total_cost']:0.2f}")
 		elif answers["opts"] == "r":
 			print("\nRemove vehicle")
 			vehicle = self.select_vehicle()
@@ -233,7 +234,13 @@ class Cli(BaseUI):
 		record_type = self.entity_manager.get(
 			EntityType.RECORD_TYPE, record.record_type_id
 		)
-		return f"{record.record_date} | {record.odometer} | {record_type.name} | £{record.cost} | {record.notes}"
+		return (
+			f"{record.record_date} | "
+			f"{record.odometer} | "
+			f"{record_type.name} | "
+			f"£{record.cost} | "
+			f"{record.notes}"
+		)
 
 	def select_record(self, vehicle):
 		"""
@@ -279,7 +286,7 @@ class Cli(BaseUI):
 			inquirer.List(
 				"record_type_id",
 				message="Type",
-				default=str(record.record_type_id) if record else "4",
+				default=str(record.record_type_id) if record else "1",
 				choices=self.get_type_choices("record"),
 			),
 			inquirer.Text(
@@ -347,9 +354,9 @@ class Cli(BaseUI):
 		# if it is a fuel record, calculate & display the fuel economy
 		if int(answers["record_type_id"]) == 1:
 			results = self.utils.calculate_economy(record)
-			print("{:0.2f} mpg".format(results["mpg"]))
-			print("{:0.2f} kpl".format(results["kpl"]))
-			print("{:0.2f} l/100Km".format(results["l100"]))
+			print(f"{results['mpg']:0.2f} mpg")
+			print(f"{results['kpl']:0.2f} kpl")
+			print(f"{results['l100']:0.2f} l/100Km")
 
 	def vehicle_form(self, vehicle=None):
 		"""
