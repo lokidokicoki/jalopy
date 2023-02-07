@@ -1,5 +1,6 @@
 #!/bin/bash
 
-source /home/loki/jalo.py/venv/bin/activate
-export PYTHONPATH=/home/loki/jalo.py
-python /home/loki/jalo.py/bin/jalo.py "$@"
+export PROJECT_PATH=/home/loki/code/jalo.py
+source $PROJECT_PATH/venv/bin/activate
+export PYTHONPATH=$PROJECT_PATH
+python $PROJECT_PATH/bin/jalo.py "$@"
