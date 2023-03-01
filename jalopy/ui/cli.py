@@ -164,10 +164,10 @@ class Cli(BaseUI):
 				"opts",
 				message="Vehicle menu",
 				choices=[
+					("Stats", "s"),
 					("Add", "a"),
 					("Edit", "e"),
 					("Remove", "r"),
-					("Stats", "s"),
 					("Back", "b"),
 				],
 			)
@@ -198,7 +198,9 @@ class Cli(BaseUI):
 				print(f"Avg. km/l: {results['avg_km_per_litre']:0.2f}")
 				print(f"Avg. l/100Km: {results['avg_l100']:0.2f}")
 				print(f"Total cost: {results['total_cost']:0.2f}")
-		elif answers["opts"] == "r":
+				print(f"Total miles: {results['total_miles']:0.2f}")
+				print(f"CPM: {results['cpm']:0.2f}")
+		elif answers['opts'] == "r":
 			print("\nRemove vehicle")
 			vehicle = self.select_vehicle()
 			if vehicle:
