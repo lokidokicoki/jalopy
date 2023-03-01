@@ -7,6 +7,7 @@ import datetime
 import inquirer  # type: ignore
 from jalopy import plots
 from jalopy.entities import EntityType, RecordEntity, VehicleEntity
+from jalopy.entities.entity_manager import EntityManager
 from jalopy.ui.base_ui import BaseUI
 
 
@@ -15,7 +16,9 @@ class Cli(BaseUI):
 	CLI Class
 	"""
 
-	is_running = True
+	def __init__(self, entity_manager: EntityManager):
+		super().__init__(entity_manager)
+		self.is_running = True
 
 	@staticmethod
 	def get_default_tyre_size(answers):
