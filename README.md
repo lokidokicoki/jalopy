@@ -4,12 +4,12 @@ Simple fuel economy and maintenance cost tracking tool for multiple vehicles.
 
 ## Installation
 
-Use a virtual environment, I recommend `pyenv`.
+This project uses poetry, so make sure tht is installed.
 
-With the virtual environment created run the following:
+Then run the following:
 
 ```
-pip install -r requirements.txt
+poetry install
 ```
 
 ## Example config
@@ -21,4 +21,4 @@ On chromeos install https://linuxhint.com/google_drive_installation_ubuntu/ ocam
 path=/mnt/chromeos/GoogleDrive/MyDrive/jalopy.db
 ```
 
-Run it like this: `source bin/run_jalo.py`
+Run it like this: `source scripts/run_jalopy.sh`
