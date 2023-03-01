@@ -40,11 +40,19 @@ class Utils:
 		avg_mpg = 0
 		avg_km_per_litre = 0
 		avg_l100 = 0
+		total_miles = 0
+		prev_miles = -1
 		counts = [{"id": x.uid, "name": x.name, "count": 0} for x in types]
 
 		for record in records:
+			if prev_miles == -1:
+				prev_miles = record.odometer
+			total_miles += record.odometer - prev_miles
+			prev_miles = record.odometer
+
 			count = next(x for x in counts if x["id"] == record.record_type_id)
 			count["count"] = count["count"] + 1
+
 			if record.record_type_id == 1:
 				eff = self.calculate_economy(record)
 
@@ -66,4 +74,6 @@ class Utils:
 			"avg_km_per_litre": avg_km_per_litre,
 			"avg_l100": avg_l100,
 			"total_cost": total_cost,
+			"total_miles": total_miles,
+			"cpm": total_cost / total_miles,
 		}
