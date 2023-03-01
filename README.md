@@ -4,7 +4,7 @@ Simple fuel economy and maintenance cost tracking tool for multiple vehicles.
 
 ## Installation
 
-This project uses poetry, so make sure tht is installed.
+This project uses poetry, so make sure that is installed.
 
 Then run the following:
 
