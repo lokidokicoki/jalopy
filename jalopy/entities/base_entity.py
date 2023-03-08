@@ -4,6 +4,6 @@ from dataclasses import dataclass
 
 @dataclass
 class BaseEntity:
-    """Base entity"""
+	"""Base entity"""
 
-    uid: int
+	uid: int
