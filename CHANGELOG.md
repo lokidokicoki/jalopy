@@ -1,3 +1,20 @@
+## v4.2.0 (2023-03-08)
+
+### Feat
+
+- **utils**: calculate total miles and cost per mile (#11)
+
+### Fix
+
+- update lock and requirements files
+- linter fixes, standardise whitesspace to use tab character
+
+## v4.1.1 (2023-03-01)
+
+### Fix
+
+- **system**: clean up shell paths
+
 ## v4.1.0 (2022-06-12)
 
 ### Fix
