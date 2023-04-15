@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class FuelType:
-	"""FuelType"""
+    """FuelType"""
 
-	uid: int
-	name: str
+    uid: int
+    name: str

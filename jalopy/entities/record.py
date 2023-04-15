@@ -5,15 +5,15 @@ from datetime import date
 
 @dataclass
 class RecordEntity:
-	"""RecordEntity"""
+    """RecordEntity"""
 
-	uid: int
-	vehicle_id: int
-	record_type_id: int
-	record_date: date
-	odometer: int
-	trip: float
-	cost: float
-	item_count: float
-	notes: str
-	archived: int = 0
+    uid: int
+    vehicle_id: int
+    record_type_id: int
+    record_date: date
+    odometer: int
+    trip: float
+    cost: float
+    item_count: float
+    notes: str
+    archived: int = 0

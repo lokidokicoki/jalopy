@@ -1,6 +1,9 @@
 #!/bin/bash
 
-export PROJECT_PATH=/home/loki/code/jalo.py
-source $PROJECT_PATH/venv/bin/activate
+PROJECT=jalo.py
+export PROJECT_PATH=/opt/$PROJECT
+export VENV=/opt/venv-$PROJECT
+export CONF=/etc/opt/$PROJECT
 export PYTHONPATH=$PROJECT_PATH
-python $PROJECT_PATH/bin/jalo.py "$@"
+source $VENV/bin/activate
+python $PROJECT_PATH/bin/jalo.py --options $CONF/config.ini "$@"
