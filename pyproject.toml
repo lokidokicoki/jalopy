@@ -13,12 +13,12 @@ inquirer = "^3.1.2"
 [tool.poetry.group.dev.dependencies]
 isort = "^5.10.1"
 mypy = "^0.942"
-black-with-tabs = "^19.10b3"
 pylint = "^2.13.1"
 flake8 = "^4.0.1"
 pre-commit = "^2.17.0"
 commitizen = "^2.21.2"
 data-science-types = "^0.2.23"
+black = "^23.3.0"
 
 
 [tool.commitizen]
