@@ -4,7 +4,7 @@ from dataclasses import dataclass
 
 @dataclass
 class RecordType:
-	"""RecordType"""
+    """RecordType"""
 
-	uid: int
-	name: str
+    uid: int
+    name: str
