@@ -1,3 +1,12 @@
+## v4.2.1 (2023-05-27)
+
+### Fix
+
+- update lock and requirements files
+- **scripts**: set execute bits. update config path
+- **bin**: use new cache dir for local copy of db
+- **Makefile**: use config and cahe dirs under home directory
+
 ## v4.2.0 (2023-03-08)
 
 ### Feat
