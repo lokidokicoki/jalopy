@@ -4,7 +4,7 @@ Will spin up the cli or gui based on passed args.
 """
 import argparse
 import configparser
-from os.path import exists
+from os.path import exists, join
 from shutil import copyfile
 
 from jalopy.db.dbclient import DatabaseClient
@@ -18,17 +18,18 @@ def main(args_):
     """
     config = configparser.ConfigParser()
     config.read(args_.options)
+    cache_path = join(config["cache"]["path"], "jalopy.db")
 
     if args_.no_backup is False:
         if exists(config["db"]["path"]):
             print("Shared DB exists")
-            copyfile(config["db"]["path"], "jalopy.db")
+            copyfile(config["db"]["path"], cache_path)
         else:
             print("Shared DB not found, we will fix it!")
     else:
         print("Not using backup")
 
-    dbclient = DatabaseClient("jalopy.db")
+    dbclient = DatabaseClient(cache_path)
     # TODO: move to ctor
     dbclient.create_database()
 
@@ -51,7 +52,7 @@ def main(args_):
     dbclient.conn.close()
 
     if args_.no_backup is False:
-        copyfile("jalopy.db", config["db"]["path"])
+        copyfile(cache_path, config["db"]["path"])
     print("Night night")
 
 

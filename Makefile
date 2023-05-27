@@ -2,9 +2,14 @@ PROJECT=jalo.py
 SOURCE=$(shell pwd)
 TARGET=/opt/$(PROJECT)
 VENV=/opt/venv-$(PROJECT)
-CONFIG=/etc/opt/$(PROJECT)
+CONFIG=$$HOME/.config/$(PROJECT)
+CACHE=$$HOME/.cache/$(PROJECT)
 
 all: reqs setup install
+
+test:
+	echo $$HOME
+	echo "$(CONFIG)"
 
 reqs:
 	poetry export -f requirements.txt -o requirements.txt --without-hashes
@@ -12,11 +17,11 @@ reqs:
 setup:
 	echo "Setup install target"
 	sudo mkdir -p $(TARGET)
-	sudo mkdir -p $(CONFIG)
 	sudo mkdir -p $(VENV)
 	sudo chown $(USER) $(TARGET)
-	sudo chown $(USER) $(CONFIG)
 	sudo chown $(USER) $(VENV)
+	mkdir -p $(CONFIG)
+	mkdir -p $(CACHE)
 	python -m venv $(VENV)
 
 install: reqs

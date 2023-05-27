@@ -7,3 +7,5 @@ config.ini
 test.db
 venv
 .vscode
+backup-jalopy.db
+
