@@ -23,7 +23,7 @@ black = "^23.3.0"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "5.0.0"
+version = "5.0.1"
 tag_format = "v$version"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
