@@ -1,7 +1,7 @@
-PROJECT=jalo.py
+PROJECT=jalopy
 SOURCE=$(shell pwd)
 TARGET=/opt/$(PROJECT)
-VENV=/opt/venv-$(PROJECT)
+VENV=/opt/venvs/$(PROJECT)
 CONFIG=$$HOME/.config/$(PROJECT)
 CACHE=$$HOME/.cache/$(PROJECT)
 
@@ -9,7 +9,10 @@ all: reqs setup install
 
 test:
 	echo $$HOME
-	echo "$(CONFIG)"
+	echo "config: $(CONFIG)"
+	echo "cache: $(CACHE)"
+	echo "target: $(TARGET)"
+	echo "venv: $(VENV)"
 
 reqs:
 	poetry export -f requirements.txt -o requirements.txt --without-hashes
@@ -31,7 +34,10 @@ install: reqs
 
 	cp $(TARGET)/config.ini $(CONFIG)/config.ini
 	$(VENV)/bin/python -m pip install -r $(TARGET)/requirements.txt
+	
 
-clean:
+uninstall:
 	sudo rm -rf $(TARGET)
 	sudo rm -rf $(VENV)
+	sudo rm -rf $(CONFIG)
+	sudo rm -rf $(CACHE)
