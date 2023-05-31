@@ -2,7 +2,7 @@
 
 PROJECT=jalopy
 export PROJECT_PATH=/opt/$PROJECT
-export VENV=/opt/venv-$PROJECT
+export VENV=/opt/venvs/$PROJECT
 export CONF=$HOME/.config/$PROJECT
 export PYTHONPATH=$PROJECT_PATH
 source $VENV/bin/activate
