@@ -1,3 +1,18 @@
+## v5.0.0 (2023-05-31)
+
+### Feat
+
+- **Makefile**: new venv dir `/opt/venvs/PROJECT. better clean rule. better test output
+
+### Fix
+
+- update lock and requirements files
+- **Makefile**: uninstall, not clean
+
+### Refactor
+
+- rename github repo, update project name
+
 ## v4.2.1 (2023-05-27)
 
 ### Fix
