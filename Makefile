@@ -36,7 +36,7 @@ install: reqs
 	$(VENV)/bin/python -m pip install -r $(TARGET)/requirements.txt
 	
 
-clean:
+uninstall:
 	sudo rm -rf $(TARGET)
 	sudo rm -rf $(VENV)
 	sudo rm -rf $(CONFIG)
