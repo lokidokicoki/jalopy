@@ -1,7 +1,7 @@
 [tool.poetry]
-name = "jalo.py"
+name = "jalopy"
 version = "1.0.0"
-description = "Fuel economay"
+description = "Fuel economy and maintenance tracker"
 authors = ["Robin Tregaskis <lokidokicoki@gmail.com>"]
 
 [tool.poetry.dependencies]

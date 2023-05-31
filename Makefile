@@ -1,4 +1,4 @@
-PROJECT=jalo.py
+PROJECT=jalopy
 SOURCE=$(shell pwd)
 TARGET=/opt/$(PROJECT)
 VENV=/opt/venv-$(PROJECT)
