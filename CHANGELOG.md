@@ -1,3 +1,9 @@
+## v5.0.2 (2023-12-02)
+
+### Fix
+
+- **pyproject**: add version sync, update pakcages
+
 ## v5.0.1 (2023-05-31)
 
 ### Fix

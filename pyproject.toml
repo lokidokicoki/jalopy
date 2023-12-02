@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "jalopy"
-version = "5.0.1"
+version = "5.0.2"
 description = "Fuel economy and maintenance tracker"
 authors = ["Robin Tregaskis <lokidokicoki@gmail.com>"]
 
@@ -23,7 +23,7 @@ black = "^23.11.0"
 
 [tool.commitizen]
 name = "cz_conventional_commits"
-version = "5.0.1"
+version = "5.0.2"
 tag_format = "v$version"
 version_files = [
     "pyproject.toml:^version"
