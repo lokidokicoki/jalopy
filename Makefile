@@ -27,6 +27,9 @@ setup:
 	mkdir -p $(CACHE)
 	python -m venv $(VENV)
 
+rsync_code:
+	rsync -amv --exclude='__pycache__' --exclude='venv' --exclude='.git' --exclude='.mypy_cache' --exclude='.vscode' . $(TARGET)
+	
 install: reqs
 	echo "Install project"
 	echo $(SOURCE) $(TARGET)
