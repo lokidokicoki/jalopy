@@ -1,7 +1,10 @@
 """
 Collection of utility functions
 """
+
 from jalopy.entities.entity_manager import EntityManager
+from jalopy.entities.record import RecordEntity
+from jalopy.entities.vehicle import VehicleEntity
 
 LITRES_PER_GALLON = 4.54609
 KM_PER_MILE = 1.60934
@@ -17,11 +20,15 @@ class Utils:
         self.entity_manager = entity_manager
 
     @staticmethod
-    def calculate_economy(record):
+    def calculate_economy(record: RecordEntity) -> dict[str, float]:
         """
+        Calculate fuel economy
         mpg
         l/100km
         km/l
+
+        :param record: record to process
+        :returns: dict of stats
         """
         trip_km = record.trip * KM_PER_MILE
         kpl = trip_km / record.item_count
@@ -30,9 +37,11 @@ class Utils:
 
         return {"mpg": mpg, "kpl": kpl, "l100": l100}
 
-    def stats(self, vehicle):
+    def stats(self, vehicle: VehicleEntity):
         """
         Accumulative stats for this vehicle
+
+        :param vehicle: target vehicle
         """
         # get all records for this vehicle
         records = self.entity_manager.get_records_for_vehicle(vehicle.uid)

@@ -1,6 +1,9 @@
+# pylint: disable=wrong-import-position
 import gi
 
 gi.require_version("Gtk", "3.0")
+# pylint: enable=wrong-import-position
+
 from gi.repository import Gtk
 from jalopy.entities.entity_manager import EntityManager
 

@@ -1,6 +1,7 @@
 """
 Database client
 """
+
 import sqlite3
 
 from . import record, vehicle
@@ -12,9 +13,10 @@ class DatabaseClient:
     """
 
     def __init__(self, db_name):
-        """Create instance od DatabaseClient
+        """
+        Create instance od DatabaseClient
 
-        :param db_name name of database to access
+        :param db_name: name of database to access
         """
         self.conn = sqlite3.connect(
             db_name, detect_types=sqlite3.PARSE_DECLTYPES | sqlite3.PARSE_COLNAMES

@@ -1,4 +1,5 @@
 """Represents a bill of some type, e.g. a service, MOT, or fuel purchase"""
+
 from dataclasses import dataclass
 from datetime import date
 

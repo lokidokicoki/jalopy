@@ -6,8 +6,9 @@ import datetime
 from typing import Optional
 
 import inquirer  # type: ignore
+
 from jalopy import plots
-from jalopy.entities import EntityType, RecordEntity, VehicleEntity
+from jalopy.entities import EntityType, RecordEntity, RecordType, VehicleEntity
 from jalopy.entities.entity_manager import EntityManager
 from jalopy.ui.base_ui import BaseUI
 
@@ -23,23 +24,29 @@ class Cli(BaseUI):
 
     @staticmethod
     def get_default_tyre_size(answers):
-        """Get default tyre size, in this case, front
+        """
+        Get default tyre size, in this case, front
 
-        :param answers answers so far
+        :param answers: answers so far
         """
         return answers["tyre_size_front"]
 
     @staticmethod
     def get_default_tyre_pressure(answers):
-        """Get default tyre pressure, in this case, front
+        """
+        Get default tyre pressure, in this case, front
 
-        :param answers answers so far
+        :param answers: answers so far
         """
         return answers["tyre_pressure_front"]
 
     @staticmethod
     def check_length(_, current):
-        """Check length of answer"""
+        """
+        Check length of answer
+
+        :param current: current answer
+        """
         if len(current) == 0:
             print("No value given")
             raise inquirer.errors.ValidationError("", reason="Please supply a value")
@@ -48,8 +55,12 @@ class Cli(BaseUI):
 
     @staticmethod
     def check_date(_, current: Optional[str]):
-        """Check current answer matches required date format"""
-        if len(current) == 0:
+        """
+        Check current answer matches required date format
+
+        :param current: current asnwer
+        """
+        if current is None or len(current) == 0:
             print("No value given")
         else:
             try:
@@ -63,6 +74,8 @@ class Cli(BaseUI):
     def get_type_choices(self, required_type):
         """
         Get 'type' records, either fuel or record based on 'required_type'
+
+        :param required_type: type we want
         """
         types = (
             self.entity_manager.fuel_types
@@ -90,6 +103,7 @@ class Cli(BaseUI):
         ]
 
         answers = inquirer.prompt(questions)
+        assert answers, "Plot menu failed answers"
 
         if answers["opts"] == "1":
             print("\nHistoric prices")
@@ -126,6 +140,7 @@ class Cli(BaseUI):
         ]
 
         answers = inquirer.prompt(questions)
+        assert answers, "Record answers failed"
 
         if answers["opts"] == "a":
             print("\nAdd record")
@@ -174,6 +189,7 @@ class Cli(BaseUI):
         ]
 
         answers = inquirer.prompt(questions)
+        assert answers, "Vehicles answers failed"
 
         if answers["opts"] == "a":
             print("\nAdd vehicle")
@@ -212,6 +228,8 @@ class Cli(BaseUI):
     def select_vehicle(self) -> Optional[VehicleEntity]:
         """
         Prompt user to select a vehicle
+
+        :returns: a Vehicle
         """
         all_vehicles = self.entity_manager.vehicles  # self.db_client.vehicles.get()
 
@@ -227,14 +245,17 @@ class Cli(BaseUI):
 
         answers = inquirer.prompt(questions)
 
+        assert answers, "Select vehicle answers failed"
         if answers["opts"] == "b":
             return None
 
         return next(x for x in all_vehicles if x.uid == int(answers["opts"]))
 
-    def record_summary(self, record: RecordEntity):
+    def record_summary(self, record: RecordEntity) -> str:
         """
         Print summary of record
+
+        :param record: record to summarise
         """
         record_type = self.entity_manager.get(
             EntityType.RECORD_TYPE, record.record_type_id
@@ -242,7 +263,7 @@ class Cli(BaseUI):
         return (
             f"{record.record_date} | "
             f"{record.odometer} | "
-            f"{record_type.name} | "
+            f"{record_type.name if isinstance(record_type, RecordType) else 'n/a'} | "
             f"£{record.cost} | "
             f"{record.notes}"
         )
@@ -250,6 +271,8 @@ class Cli(BaseUI):
     def select_record(self, vehicle: VehicleEntity):
         """
         Select a record for a specific vehicle
+
+        :param vehicle: target to get records for
         """
         all_records = self.entity_manager.get_records_for_vehicle(vehicle.uid)
 
@@ -265,6 +288,7 @@ class Cli(BaseUI):
 
         answers = inquirer.prompt(questions)
 
+        assert answers, "Select record answers failed"
         if answers["opts"] == "b":
             return None
 
@@ -273,6 +297,8 @@ class Cli(BaseUI):
     def record_form(self, record: Optional[RecordEntity] = None):
         """
         Create/edit 'record'
+
+        :param record: if None, create a new record, else use this to edit.
         """
         print("record_form")
         all_vehicles = self.entity_manager.vehicles
@@ -297,9 +323,11 @@ class Cli(BaseUI):
             inquirer.Text(
                 "record_date",
                 message="Date (YYYY-MM-DD)",
-                default=record.record_date.isoformat()
-                if record
-                else datetime.date.today().isoformat(),
+                default=(
+                    record.record_date.isoformat()
+                    if record
+                    else datetime.date.today().isoformat()
+                ),
                 validate=self.check_date,
             ),
             inquirer.Text(
@@ -333,6 +361,7 @@ class Cli(BaseUI):
         ]
 
         answers = inquirer.prompt(questions)
+        assert answers, "Create/edit record answers failed"
 
         # process, then save
         if record:
@@ -368,6 +397,8 @@ class Cli(BaseUI):
     def vehicle_form(self, vehicle: Optional[VehicleEntity] = None):
         """
         Create/edit vehicle
+
+        :param vehicle: if None, create a new record, else use this to edit.
         """
         questions = [
             inquirer.Text(
@@ -451,22 +482,25 @@ class Cli(BaseUI):
             inquirer.Text(
                 "tyre_size_rear",
                 message="Tyre size rear",
-                default=vehicle.tyre_size_rear
-                if vehicle
-                else self.get_default_tyre_size,
+                default=(
+                    vehicle.tyre_size_rear if vehicle else self.get_default_tyre_size
+                ),
                 validate=self.check_length,
             ),
             inquirer.Text(
                 "tyre_pressure_rear",
                 message="Tyre pressure rear",
-                default=vehicle.tyre_pressure_rear
-                if vehicle
-                else self.get_default_tyre_pressure,
+                default=(
+                    vehicle.tyre_pressure_rear
+                    if vehicle
+                    else self.get_default_tyre_pressure
+                ),
                 validate=self.check_length,
             ),
         ]
 
         answers = inquirer.prompt(questions)
+        assert answers, "Create/edit vehicle answers failed"
 
         # process, then save
         answers["reg_no"] = answers["reg_no"].upper()
@@ -542,6 +576,7 @@ class Cli(BaseUI):
 
         answers = inquirer.prompt(questions)
 
+        assert answers, "Main answers failed"
         if answers["opts"] == "x":
             self.is_running = False
         elif answers["opts"] == "v":
