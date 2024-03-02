@@ -1,4 +1,5 @@
 [flake8]
 per-file-ignores = __init__.py:F401
 use-flake8-tabs = True
-ignore: W191
+extend-ignore= W191,E402
+max-line-length=88

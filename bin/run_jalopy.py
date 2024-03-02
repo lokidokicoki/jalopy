@@ -1,7 +1,9 @@
-"""Main runner for the app.
+"""
+Main runner for the app.
 
 Will spin up the cli or gui based on passed args.
 """
+
 import argparse
 import configparser
 from os.path import exists, join
@@ -63,5 +65,5 @@ parser.add_argument("-d", "--debug", help="use debug", action="store_true")
 parser.add_argument("-n", "--no-backup", help="do not use backup", action="store_true")
 args = parser.parse_args()
 
-
-main(args)
+if __name__ == "__main__":
+    main(args)

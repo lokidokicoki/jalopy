@@ -1,13 +1,17 @@
+"""
+Generate various plots
+"""
+
 from typing import List
 
-import matplotlib
-
-matplotlib.use("TkAgg")
+# matplotlib.use("TkAgg")
 import matplotlib.dates as mdates  # type: ignore
 import matplotlib.pyplot as plot
 
 from jalopy.entities import RecordEntity, VehicleEntity
 from jalopy.utils import Utils
+
+# import matplotlib
 
 
 def historic_prices(records: List[RecordEntity]):

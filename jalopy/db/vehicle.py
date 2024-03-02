@@ -1,4 +1,5 @@
 """DB Vehicle"""
+
 from jalopy.db.base_item import BaseItem
 
 

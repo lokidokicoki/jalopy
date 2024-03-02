@@ -7,6 +7,13 @@ CACHE=$$HOME/.cache/$(PROJECT)
 
 all: reqs setup install
 
+format:
+	black bin/ jalopy/
+
+lint:
+	pylint bin/ jalopy/
+	flake8 --config .flake8 bin/ jalopy/
+
 test:
 	echo $$HOME
 	echo "config: $(CONFIG)"
@@ -15,6 +22,7 @@ test:
 	echo "venv: $(VENV)"
 
 reqs:
+	poetry update
 	poetry export -f requirements.txt -o requirements.txt --without-hashes
 
 setup:
@@ -29,7 +37,7 @@ setup:
 
 rsync_code:
 	rsync -amv --exclude='__pycache__' --exclude='venv' --exclude='.git' --exclude='.mypy_cache' --exclude='.vscode' . $(TARGET)
-	
+
 install: reqs
 	echo "Install project"
 	echo $(SOURCE) $(TARGET)
@@ -37,7 +45,7 @@ install: reqs
 
 	cp $(TARGET)/config.ini $(CONFIG)/config.ini
 	$(VENV)/bin/python -m pip install -r $(TARGET)/requirements.txt
-	
+
 
 uninstall:
 	sudo rm -rf $(TARGET)

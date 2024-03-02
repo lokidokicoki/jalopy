@@ -1,6 +1,7 @@
 """
 Base db item
 """
+
 from typing import Optional
 
 
@@ -8,18 +9,20 @@ class BaseItem:
     """BaseItem"""
 
     def __init__(self, conn, cursor, table_name: Optional[str] = None):
-        """Create an instance of a BaseItem
+        """
+        Create an instance of a BaseItem
 
-        :param conn database connection
-        :param cursor database cursor
-        :param table_name table the item represents
+        :param conn: database connection
+        :param cursor: database cursor
+        :param table_name: table the item represents
         """
         self.conn = conn
         self.cursor = cursor
         self.table_name = table_name
 
     def create(self, data):
-        """Create a new row in the database
+        """
+        Create a new row in the database
 
         :param data: row data
         :return: newly inserted row
@@ -41,22 +44,24 @@ class BaseItem:
         self.conn.commit()
         return new_record
 
-    def read(self, where: Optional[str] = None):
-        """Read from the table
+    def read(self, where_clause: Optional[str] = None):
+        """
+        Read from the table
 
-        :param where optional where clause
+        :param where_clause: optional where clause
         """
         sql = f"SELECT * FROM {self.table_name} WHERE archived = 0"
-        if where:
-            sql += f" AND {where}"
+        if where_clause:
+            sql += f" AND {where_clause}"
 
         self.cursor.execute(sql)
         return self.cursor.fetchall()
 
     def update(self, data):
-        """Update record in table
+        """
+        Update record in table
 
-        :param data details to update
+        :param data: details to update
         """
         fields = []
         for key in data.keys():
@@ -68,9 +73,10 @@ class BaseItem:
         self.conn.commit()
 
     def delete(self, uid: int):
-        """Delete/archive row in table
+        """
+        Delete/archive row in table
 
-        :param uid identifer or row
+        :param uid: identifer of row
         """
         sql = f"UPDATE {self.table_name} SET archived=1 WHERE uid={uid}"
         self.cursor.execute(sql)

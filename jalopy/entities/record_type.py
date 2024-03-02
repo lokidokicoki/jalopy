@@ -1,4 +1,5 @@
 """Represents a type of record"""
+
 from dataclasses import dataclass
 
 

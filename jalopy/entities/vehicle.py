@@ -1,4 +1,5 @@
 """Represents a vehicle"""
+
 from dataclasses import dataclass
 from datetime import date
 

@@ -1,4 +1,5 @@
 """Represents a type of fuel"""
+
 from dataclasses import dataclass
 
 

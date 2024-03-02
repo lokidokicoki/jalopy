@@ -14,8 +14,9 @@ from .vehicle import VehicleEntity
 
 
 class EntityManager:
-    """The EntityManager collates all entities and provides methods to get and
-    add new ones"""
+    """
+    The EntityManager collates all entities and provides methods to get and add new ones
+    """
 
     def __init__(self, dbclient: DatabaseClient):
         self.records: List[RecordEntity] = []
@@ -26,11 +27,12 @@ class EntityManager:
 
     def get(
         self, entity_type: EntityType, uid: int
-    ) -> Union[VehicleEntity, RecordEntity, RecordType, FuelType]:
-        """Get a specific entity from the collection
+    ) -> Optional[Union[VehicleEntity, RecordEntity, RecordType, FuelType]]:
+        """
+        Get a specific entity from the collection
 
-        :param: entity_type
-        :param: uid
+        :param entity_type: type of entity to get
+        :param uid: entity UID
         """
 
         if uid is None:
@@ -51,7 +53,11 @@ class EntityManager:
         return next((x for x in collection if x.uid == uid), None)
 
     def get_records_for_vehicle(self, vehicle_id: int):
-        """Get records for a specific vehicle"""
+        """
+        Get records for a specific vehicle
+
+        :param vehicle_id: UID of vehicle
+        """
         if vehicle_id is None:
             raise TypeError("get_records_for_vehicle missing entity_id")
 
@@ -64,7 +70,8 @@ class EntityManager:
         return records
 
     def add(self, entity: Union[VehicleEntity, RecordEntity, RecordType, FuelType]):
-        """Add an entity to the relevant collection
+        """
+        Add an entity to the relevant collection
 
         :param entity: to be added
         """
@@ -150,13 +157,24 @@ class EntityManager:
 
     @staticmethod
     def as_record(entity):
+        """
+        Convert entity dict members to correct type for DB update.
+
+        :param entity: to be converted
+        """
         record = asdict(entity)
         for key in record.keys():
             if isinstance(record[key], datetime.date):
                 record[key] = datetime.date.isoformat(record[key])
         return record
 
-    def remove(self, entity: Union[RecordEntity, RecordEntity]):
+    def remove(self, entity: Union[RecordEntity, VehicleEntity]):
+        """
+        Remove an Entity from the database
+
+        :param entity: the entity isntance to remove
+        :type entity: Union[RecordEntity,VehicleEntity]
+        """
         if isinstance(entity, VehicleEntity):
             self.dbclient.vehicle.delete(entity.uid)
             self.vehicles.remove(entity)
@@ -169,6 +187,12 @@ class EntityManager:
     def filter_records_by_type(
         self, type_: int, records: Optional[List[RecordEntity]] = None
     ):
+        """
+        Filter all or subset of records by record type
+
+        :param type_: record type to filter for
+        :param records: optional list of records to filter
+        """
         if records:
             records = [
                 x for x in records if x.record_type_id == type_ and x.archived == 0

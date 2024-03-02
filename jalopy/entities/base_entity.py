@@ -1,4 +1,5 @@
 """BaseEntity"""
+
 from dataclasses import dataclass
 
 
