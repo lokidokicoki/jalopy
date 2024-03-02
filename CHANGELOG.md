@@ -1,3 +1,9 @@
+## v6.0.0 (2024-03-02)
+
+### Refactor
+
+- new line length, doc comments. LSP fixes
+
 ## v5.0.2 (2023-12-02)
 
 ### Fix
