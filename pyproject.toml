@@ -21,6 +21,9 @@ data-science-types = "^0.2.23"
 black = "^23.11.0"
 
 
+[tool.black]
+line-length=88
+
 [tool.commitizen]
 name = "cz_conventional_commits"
 version = "5.0.2"
